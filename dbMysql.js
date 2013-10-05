@@ -2,8 +2,12 @@ var mysql = require('mysql');
 
 var log;
 var dbConfig = {};
-exports.logger = function (srvLog) { log = srvLog }
-exports.dbConfig = function (srvMysql) { dbConfig = srvMysql }
+exports.logger = function (srvLog) {
+    log = srvLog
+}
+exports.dbConfig = function (srvMysql) {
+    dbConfig = srvMysql
+}
 
 var usersTable = 'users';
 var groupsTable = 'groups';
@@ -14,17 +18,16 @@ var connection;
 function handleDisconnect() {
     connection = mysql.createConnection(dbConfig);
 
-    connection.connect(function(err) {
-        if(err) {
+    connection.connect(function (err) {
+        if (err) {
             log.error('error when connecting to db:' + err);
             setTimeout(handleDisconnect, 2000);
-        }
-		else log.info('connection to MySQL established.')
+        } else log.info('connection to MySQL established.')
     });
 
-    connection.on('error', function(err) {
+    connection.on('error', function (err) {
         log.error('db error: ' + err);
-        if(err.code === 'PROTOCOL_CONNECTION_LOST') {
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
             handleDisconnect();
         } else {
             throw err;
@@ -80,7 +83,7 @@ function query(tableName, columnName, value, callback) {
 }
 
 if (!String.prototype.format) {
-    String.prototype.format = function() {
+    String.prototype.format = function () {
         var str = this.toString();
         if (!arguments.length)
             return str;

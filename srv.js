@@ -66,7 +66,7 @@ app.configure(function () {
     app.use(app.router);
     app.use(function (req, res, next) {
         res.status(404);
-		log.debug('Sender: ' + req.headers.host);
+        log.debug('Sender: ' + req.headers.host);
         log.debug('Not found URL: %s', req.url);
         res.send({
             error: 'Resource ot found'
@@ -75,12 +75,11 @@ app.configure(function () {
     });
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
-		log.error('Sender: ' + req.headers.host);
+        log.error('Sender: ' + req.headers.host);
         log.error('Internal error(%d): %s', res.statusCode, err.message);
-        res.send({
+        return res.send({
             error: err.message
         });
-        return;
     });
 });
 
@@ -102,8 +101,8 @@ app.get("/user/:id", function (req, res) {
     log.debug(req.headers.host + ' requests: ' + req.url);
     if (!req.isAuthenticated())
         return res.redirect('/');
-	if (req.params.id != 'me')
-	    return res.redirect('/user/me');
+    if (req.params.id != 'me')
+        return res.redirect('/user/me');
     log.trace('Sending ' + tools.user_html);
     res.setHeader("Content-Type", "text/html");
     res.send(tools.user_html);
@@ -126,7 +125,7 @@ app.post("/signup", function (req, res) {
             success: false,
             message: 'You are already logged in.'
         });
-	log.debug(req.body); 
+    log.debug(req.body);
     var errors = '';
     if (!helpers.validateInput(req.body.username))
         errors += 'Proper login is required<br/>'
@@ -170,19 +169,19 @@ app.post('/login', function (req, res, next) {
             success: false,
             message: 'You are already logged in.'
         });
-	log.debug(req.body); 
-	if (!helpers.validateInput(req.body.username)) {
-	    return res.send({
-			success: false,
-			message: 'authentication failed: incorrect login'
-		});
-	}
-	if (req.body.password && !helpers.validatePassword(req.body.password)) {
-	    return res.send({
-			success: false,
-			message: 'authentication failed: incorrect password'
-		});
-	}
+    log.debug(req.body);
+    if (!helpers.validateInput(req.body.username)) {
+        return res.send({
+            success: false,
+            message: 'authentication failed: incorrect login'
+        });
+    }
+    if (req.body.password && !helpers.validatePassword(req.body.password)) {
+        return res.send({
+            success: false,
+            message: 'authentication failed: incorrect password'
+        });
+    }
     passport.authenticate('local', function (err, user, info) {
         if (err) {
             return next(err);
@@ -210,21 +209,21 @@ app.post('/login', function (req, res, next) {
 
 app.post("/user/:id", function (req, res) {
     log.debug(req.headers.host + ' requests: ' + req.url);
-	if (!req.isAuthenticated())
+    if (!req.isAuthenticated())
         return res.redirect('/');
-		
-	if (req.params.id == 'me') {
-		var map = {};
-		map.success = true;
-		map.user = req.user;
-	    delete map.user.password;
-		return res.send(map);
-	}
-	
-	return res.send({
-		success: false,
-		message: 'It is possible to view only currently logged in user.'
-	});
+
+    if (req.params.id == 'me') {
+        var map = {};
+        map.success = true;
+        map.user = req.user;
+        delete map.user.password;
+        return res.send(map);
+    }
+
+    return res.send({
+        success: false,
+        message: 'It is possible to view only currently logged in user.'
+    });
 });
 
 app.get('/logout', function (req, res) {

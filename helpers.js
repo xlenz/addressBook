@@ -1,5 +1,7 @@
 var log;
-exports.logger = function (logger) { log = logger }
+exports.logger = function (logger) {
+    log = logger
+}
 
 exports.validateEmail = function (email) {
     log.trace('validateEmail: ' + email);
@@ -7,7 +9,7 @@ exports.validateEmail = function (email) {
     return re.test(email);
 }
 
-function trim (s) {
+function trim(s) {
     log.trace('trim: ' + s);
     s = s.replace(/(^\s*)|(\s*$)/gi, "");
     s = s.replace(/[ ]{2,}/gi, " ");
@@ -28,14 +30,14 @@ exports.validatePassword = function (s) {
 
 exports.validateInput = function (s) {
     log.trace('validateInput: ' + s);
-	if (!s) return null;
-	var r = s.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g,'_');
-	if (s === r) {
-	    s = trim(s);
-		if (s != '')
-	        return s;
-	}
-	return null;
+    if (!s) return null;
+    var r = s.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '_');
+    if (s === r) {
+        s = trim(s);
+        if (s != '')
+            return s;
+    }
+    return null;
 }
 
 /*
