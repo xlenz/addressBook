@@ -1,0 +1,22 @@
+{
+    "host": ""
+    ,"port": 80
+
+    ,"root_html": "html/index.html"
+    ,"signup_html": "html/signUp.html"
+    ,"signin_html": "html/signIn.html"
+    ,"user_html": "html/user.html"
+    ,"log_cfg_path": "config/log.config.json"
+	
+	,"mysql": {
+	    "host": "localhost"
+	    ,"user": "aBookUsr"
+	    ,"password": "JS_Course"
+	    ,"database": "addrBook"
+    }
+
+	,"mongo": {
+	    "host": "localhost"
+	    ,"db" : "addrBook"
+	}
+}

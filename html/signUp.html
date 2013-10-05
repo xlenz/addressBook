@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+    <title>Sign up</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Brief description">
+    <meta name="author" content="MG">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link href="libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<link href="styles/sign.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+      <script src="libs/assets/js/html5shiv.js"></script>
+      <script src="libs/assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  
+  <body>
+    <div class="container">
+
+      <form class="form-signin">
+        <h2 class="form-signin-heading">Create an Account</h2>
+        <input type="text" id="username" class="form-control" placeholder="Login" maxlength="30" autofocus>
+        <input type="password" id="password" class="form-control mergeBot" placeholder="Password" maxlength="30">
+        <input type="password" id="passwordRe" class="form-control mergeTop" placeholder="Repeat password" maxlength="30">
+
+        <button class="btn btn-lg btn-success btn-block" type="submit" id="signup">Sign up</button>
+        <div id="errors" class="has-error" style="display: none;">
+          <label class="control-label">Unknown error.</label>
+        </div>
+      </form>
+
+    </div>
+	
+    <script src="libs/jquery-2.0.3.min.js"></script>
+    <script src="libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/auth.js"></script>
+  </body>
+</html>

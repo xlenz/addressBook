@@ -1,0 +1,234 @@
+var express = require('express');
+var helpers = require('./helpers.js');
+var tools = require('./tools.js');
+var dbMysql = require('./dbMysql.js');
+
+var log = tools.logger;
+dbMysql.logger(log);
+dbMysql.dbConfig(tools.mysql);
+helpers.logger(log);
+
+var MongoStore = require('connect-mongo')(express);
+
+var passport = require('passport'),
+    LocalStrategy = require('passport-local').Strategy;
+
+passport.use(new LocalStrategy(
+    function (username, password, done) {
+        dbMysql.usrFindOne({
+            username: username
+        }, function (err, user) {
+            if (err) {
+                return done(err);
+            }
+            if (!user) {
+                return done(null, false, {
+                    message: 'Incorrect username.'
+                });
+            }
+            if (password != user.password) {
+                return done(null, false, {
+                    message: 'Incorrect password.'
+                });
+            }
+            return done(null, user);
+        });
+    }
+));
+
+passport.serializeUser(function (user, done) {
+    done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+    dbMysql.usrFindById(id, function (err, user) {
+        done(err, user);
+    });
+});
+
+var app = express(),
+    http = require('http'),
+    server = http.createServer(app);
+
+app.configure(function () {
+    app.use(express.static(__dirname + '/web'));
+    app.use(express.cookieParser());
+    app.use(express.bodyParser());
+    app.use(express.session({
+        secret: 'task js course',
+        cookie: {
+            maxAge: 10080000 //one week, one hour - 3600000
+        },
+        store: new MongoStore(tools.mongo)
+    }));
+    app.use(passport.initialize());
+    app.use(passport.session());
+    app.use(app.router);
+    app.use(function (req, res, next) {
+        res.status(404);
+		log.debug('Sender: ' + req.headers.host);
+        log.debug('Not found URL: %s', req.url);
+        res.send({
+            error: 'Resource ot found'
+        });
+        return;
+    });
+    app.use(function (err, req, res, next) {
+        res.status(err.status || 500);
+		log.error('Sender: ' + req.headers.host);
+        log.error('Internal error(%d): %s', res.statusCode, err.message);
+        res.send({
+            error: err.message
+        });
+        return;
+    });
+});
+
+server.listen(tools.port, tools.host, function () {
+    log.info('Listening - ' + (tools.host || '*') + ':' + (tools.port || 'default'));
+});
+tools.server(server);
+
+app.get("/", function (req, res) {
+    log.debug(req.headers.host + ' requests: ' + req.url);
+    if (req.isAuthenticated())
+        return res.redirect('/user/me');
+    log.trace('Sending ' + tools.root_html);
+    res.setHeader("Content-Type", "text/html");
+    res.send(tools.root_html);
+});
+
+app.get("/user/:id", function (req, res) {
+    log.debug(req.headers.host + ' requests: ' + req.url);
+    if (!req.isAuthenticated())
+        return res.redirect('/');
+	if (req.params.id != 'me')
+	    return res.redirect('/user/me');
+    log.trace('Sending ' + tools.user_html);
+    res.setHeader("Content-Type", "text/html");
+    res.send(tools.user_html);
+});
+
+
+app.get("/signup", function (req, res) {
+    log.debug(req.headers.host + ' requests: ' + req.url);
+    if (req.isAuthenticated())
+        return res.redirect('/');
+    log.trace('Sending ' + tools.signup_html);
+    res.setHeader("Content-Type", "text/html");
+    res.send(tools.signup_html);
+});
+
+app.post("/signup", function (req, res) {
+    log.debug(req.headers.host + ' requests: ' + req.url);
+    if (req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You are already logged in.'
+        });
+	log.debug(req.body); 
+    var errors = '';
+    if (!helpers.validateInput(req.body.username))
+        errors += 'Proper login is required<br/>'
+
+    if (!req.body.password || !helpers.validatePassword(req.body.password))
+        errors += 'Password is required, should be minimum 3 symbols length and can contain only a-z, A-Z, 0-9 and symbols ~!@#$%^&*()_+-=';
+
+    if (errors != '') {
+        return res.send({
+            success: false,
+            message: errors
+        });
+    }
+
+    dbMysql.usrCreate(req.body.username, req.body.password, function (err, user) {
+        if (err) {
+            res.send({
+                success: false,
+                message: err
+            });
+        } else res.send({
+            success: true,
+            message: user
+        });
+    });
+});
+
+app.get("/login", function (req, res) {
+    log.debug(req.headers.host + ' requests: ' + req.url);
+    if (req.isAuthenticated())
+        return res.redirect('/');
+    log.trace('Sending ' + tools.signin_html);
+    res.setHeader("Content-Type", "text/html");
+    res.send(tools.signin_html);
+});
+
+app.post('/login', function (req, res, next) {
+    log.debug(req.headers.host + ' requests: ' + req.url);
+    if (req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You are already logged in.'
+        });
+	log.debug(req.body); 
+	if (!helpers.validateInput(req.body.username)) {
+	    return res.send({
+			success: false,
+			message: 'authentication failed: incorrect login'
+		});
+	}
+	if (req.body.password && !helpers.validatePassword(req.body.password)) {
+	    return res.send({
+			success: false,
+			message: 'authentication failed: incorrect password'
+		});
+	}
+    passport.authenticate('local', function (err, user, info) {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            res.send({
+                success: false,
+                message: 'authentication failed'
+            });
+        }
+        req.logIn(user, function (err) {
+            if (err) {
+                return res.send({
+                    success: false,
+                    message: 'authentication failed'
+                });
+            }
+            return res.send({
+                success: true,
+                message: 'authentication succeeded'
+            });
+        });
+    })(req, res, next);
+})
+
+app.post("/user/:id", function (req, res) {
+    log.debug(req.headers.host + ' requests: ' + req.url);
+	if (!req.isAuthenticated())
+        return res.redirect('/');
+		
+	if (req.params.id == 'me') {
+		var map = {};
+		map.success = true;
+		map.user = req.user;
+	    delete map.user.password;
+		return res.send(map);
+	}
+	
+	return res.send({
+		success: false,
+		message: 'It is possible to view only currently logged in user.'
+	});
+});
+
+app.get('/logout', function (req, res) {
+    log.debug(req.headers.host + ' requests: ' + req.url);
+    req.logout();
+    res.redirect('/');
+});
