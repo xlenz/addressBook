@@ -60,43 +60,122 @@ exports.userGroups = function (user_id, callback) {
     select(groupsTable, 'user_id', user_id, callback);
 }
 
-exports.usrCreate = function (username, pwd, callback) {
-    var queryStr = "INSERT INTO {usersTable} (`login`, `password`) VALUES ('{login}', '{pwd}');"
-        .format({
-            usersTable: usersTable,
-            login: username,
-            pwd: pwd,
-        });
-    insert(queryStr, 'User with login ' + username + ' already exists.', callback);
+exports.contactDelete = function (id, callback) {
+    deleteOne(contactsTable, 'id', id, callback);
 }
 
-function insert (queryStr, err, callback) {
-    log.debug(queryStr);
-    connection.query(queryStr, function (err, rows, fields) {
-        if (err) {
-            if (err.code == 'ER_DUP_ENTRY')
-                callback(err);
-            else
-                callback(err.code);
-        } else if (rows && rows.length > 0)
-            callback(null, rows.insertId);
-        else
-            callback(null, null);
-    });
+exports.groupDelete = function (id, callback) {
+    deleteOne(groupsTable, 'id', id, callback);
+}
+
+exports.usrCreate = function (username, pwd, callback) {
+    var queryStr = "INSERT INTO {table} (`login`, `password`) VALUES ('{login}', '{pwd}');"
+        .format({
+            table: usersTable,
+            login: username,
+            pwd: pwd
+        });
+    exQuery(queryStr, 'User with login ' + username + ' already exists.', callback);
+}
+
+exports.groupCreate = function (user_id, name, callback) {
+    var queryStr = "INSERT INTO {table} (`user_id`, `name`, `rank`) VALUES ('{user_id}', '{name}', '2');"
+        .format({
+            table: groupsTable,
+            user_id: user_id,
+            name: name
+        });
+    exQuery(queryStr, 'User with login ' + username + ' already exists.', callback);
+}
+
+exports.groupUpdate = function (id, name, callback) {
+    var queryStr = "UPDATE {table} set name='{name}' where id = {id};"
+        .format({
+            table: groupsTable,
+            id: id,
+            name: name
+        });
+    exQuery(queryStr, null, callback);
+}
+
+exports.contactCreate = function (contact, callback) {
+    for (var key in contact) {
+        if (contact[key] != null)
+            contact[key] = "'" + contact[key] + "'";
+    }
+    var queryStr = "INSERT INTO {table} (`user_id`, `group_id`, `email`, `phone`, `firstName`, `lastName`) VALUES ({user_id}, {group_id}, {email}, {phone}, {firstName}, {lastName});"
+        .format({
+            table: contactsTable,
+            user_id: contact.user_id,
+            group_id: contact.group_id,
+            email: contact.email,
+            phone: contact.phone,
+            firstName: contact.firstName,
+            lastName: contact.lastName
+        });
+    exQuery(queryStr, 'User with login ' + username + ' already exists.', callback);
+}
+
+exports.contactUpdate = function (contact, callback) {
+    var contact_id = contact.id;
+    delete contact.id;
+    var set = '';
+    if (contact.group_id !== undefined) {
+        set = ' group_id = ' + contact.group_id;
+        delete contact.group_id;
+    }
+    if (contact.user_id !== undefined) delete contact.user_id;
+
+    for (var key in contact) {
+        if (contact[key] != null)
+            set += ' ' + key + ' = ' + contact[key];
+    }
+    if (set == '') return callback ('Nothing to update in contact.');
+    var queryStr = "UPDATE {table} set{set} where id = {id};"
+        .format({
+            table: contactsTable,
+            set: set,
+            id: contact_id
+        });
+    exQuery(queryStr, null, callback);
+}
+
+exports.contactSetGroup = function (ids, group_id, callback) {
+    var idList = '';
+    for (var key in ids) {
+        idList += ids[key] + ',';
+    }
+    if (idList == '') return callback ('No contacts to be set for group.');
+    var queryStr = "UPDATE {table} set group_id={group_id} where id in ({idList});"
+        .format({
+            table: contactsTable,
+            group_id: group_id,
+            idList: idList.slice(0, -1)
+        });
+    exQuery(queryStr, null, callback);
 }
 
 function selectOne (tableName, columnName, value, callback) {
-    var queryStr = "SELECT * from {tableName} where {columnName}='{value}';".format({
-        tableName: tableName,
+    var queryStr = "SELECT * from {table} where {columnName}='{value}';".format({
+        table: tableName,
         columnName: columnName,
         value: value
     });
     select(queryStr, callback, 0);
 }
 
+function deleteOne (tableName, columnName, value, callback) {
+    var queryStr = "DELETE from {table} where {columnName}='{value}';".format({
+        table: tableName,
+        columnName: columnName,
+        value: value
+    });
+    exQuery(queryStr, null, callback);
+}
+
 function selectAllOrderBy (tableName, columnName, value, orderBy, callback) {
-    var queryStr = "SELECT * from {tableName} where {columnName}='{value} order by {orderBy}';".format({
-        tableName: tableName,
+    var queryStr = "SELECT * from {table} where {columnName}='{value} order by {orderBy}';".format({
+        table: tableName,
         columnName: columnName,
         value: value,
         orderBy: orderBy
@@ -108,11 +187,28 @@ function select (queryStr, callback, rowNum) {
     log.debug(queryStr);
     connection.query(queryStr, function (err, rows) {
         if (err) callback(err.code);
-        else if (rows && rows.length > 0)
+        else if (rows && rows.length > 0) {
             if (rowNum != null)
                 callback(null, rows[rowNum]);
             else
                 callback(null, rows);
+        }
+        else
+            callback(null, null);
+    });
+}
+
+function exQuery (queryStr, err, callback) {
+    log.debug(queryStr);
+    connection.query(queryStr, function (err, rows) {
+        log.warn('exQuery: ' + rows);
+        if (err) {
+            if (err.code == 'ER_DUP_ENTRY' && err)
+                callback(err);
+            else
+                callback(err.code);
+        } else if (rows && rows.length > 0)
+            callback(null, rows.insertId);
         else
             callback(null, null);
     });

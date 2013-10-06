@@ -20,7 +20,8 @@ CREATE TABLE groups (
     `name` CHAR(30) NOT NULL,
     `rank` INT(9) NOT NULL DEFAULT 2,
     FOREIGN KEY (user_id)
-        REFERENCES users (id),
+        REFERENCES users (id)
+        ON DELETE SET NULL,
     UNIQUE (`user_id`, `name`),
     PRIMARY KEY (`id`)
 );
@@ -37,13 +38,15 @@ CREATE TABLE contacts (
     `user_id` INT(11) NOT NULL,
     `group_id` INT(11),
     `email` CHAR(50),
-    `phone` CHAR(50) NOT NULL,
+    `phone` CHAR(50),
     `firstName` CHAR(50) NOT NULL,
     `lastName` CHAR(50),
     FOREIGN KEY (user_id)
-        REFERENCES users (id),
+        REFERENCES users (id)
+        ON DELETE SET NULL,
     FOREIGN KEY (group_id)
-        REFERENCES groups (id),
+        REFERENCES groups (id)
+        ON DELETE SET NULL,
     PRIMARY KEY (`id`)
 );
 

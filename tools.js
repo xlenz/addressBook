@@ -35,8 +35,6 @@ fs.watchFile(configName, function (current, previous) {
     server.listen(config.port, config.host, function () {
         log.info('Now listening - ' + (tools.host || '*') + ':' + (tools.port || 'default'));
     });
-    exports.host = config.host;
-    exports.port = config.port;
 });
 
 function watchHtml (htmlFilePath, htmlFile, callback) {
