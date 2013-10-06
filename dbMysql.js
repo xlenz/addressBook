@@ -47,25 +47,25 @@ exports.usrFindById = function (id, callback) {
 
 exports.allContacts = function (user_id, callback) {
     var orderBy = 'firstName, lastName';
-    select(contactsTable, 'user_id', user_id, callback);
+    selectAllOrderBy(contactsTable, 'user_id', user_id, orderBy, callback);
 }
 
 exports.groupContacts = function (group_id, callback) {
     var orderBy = 'firstName, lastName';
-    select(contactsTable, 'group_id', group_id, callback);
+    selectAllOrderBy(contactsTable, 'group_id', group_id, orderBy, callback);
 }
 
 exports.userGroups = function (user_id, callback) {
     var orderBy = 'rank, name';
-    select(groupsTable, 'user_id', user_id, callback);
+    selectAllOrderBy(groupsTable, 'user_id', user_id, orderBy, callback);
 }
 
-exports.contactDelete = function (id, callback) {
-    deleteOne(contactsTable, 'id', id, callback);
+exports.contactDelete = function (id, user_id, callback) {
+    deleteOne(contactsTable, 'id', id, user_id, callback);
 }
 
-exports.groupDelete = function (id, callback) {
-    deleteOne(groupsTable, 'id', id, callback);
+exports.groupDelete = function (id, user_id, callback) {
+    deleteOne(groupsTable, 'id', id, user_id, callback);
 }
 
 exports.usrCreate = function (username, pwd, callback) {
@@ -85,7 +85,7 @@ exports.groupCreate = function (user_id, name, callback) {
             user_id: user_id,
             name: name
         });
-    exQuery(queryStr, 'User with login ' + username + ' already exists.', callback);
+    exQuery(queryStr, 'Group with name ' + name + ' already exists.', callback);
 }
 
 exports.groupUpdate = function (id, name, callback) {
@@ -107,49 +107,51 @@ exports.contactCreate = function (contact, callback) {
         .format({
             table: contactsTable,
             user_id: contact.user_id,
-            group_id: contact.group_id,
+            group_id: contact.group_id || null,
             email: contact.email,
             phone: contact.phone,
             firstName: contact.firstName,
             lastName: contact.lastName
         });
-    exQuery(queryStr, 'User with login ' + username + ' already exists.', callback);
+    exQuery(queryStr, null, callback);
 }
 
 exports.contactUpdate = function (contact, callback) {
     var contact_id = contact.id;
     delete contact.id;
+    var user_id = contact.user_id;
+    delete contact.user_id;
     var set = '';
     if (contact.group_id !== undefined) {
-        set = ' group_id = ' + contact.group_id;
+        set = ' group_id = ' + contact.group_id + ',';
         delete contact.group_id;
     }
-    if (contact.user_id !== undefined) delete contact.user_id;
-
     for (var key in contact) {
         if (contact[key] != null)
-            set += ' ' + key + ' = ' + contact[key];
+            set += ' ' + key + " = '" + contact[key] + "',";
     }
     if (set == '') return callback ('Nothing to update in contact.');
-    var queryStr = "UPDATE {table} set{set} where id = {id};"
+    var queryStr = "UPDATE {table} set{set} where id = {id} and user_id = {user_id};"
         .format({
             table: contactsTable,
-            set: set,
-            id: contact_id
+            set: set.slice(0, -1),
+            id: contact_id,
+            user_id: user_id
         });
     exQuery(queryStr, null, callback);
 }
 
-exports.contactSetGroup = function (ids, group_id, callback) {
+exports.contactSetGroup = function (ids, group_id, user_id, callback) {
     var idList = '';
     for (var key in ids) {
         idList += ids[key] + ',';
     }
     if (idList == '') return callback ('No contacts to be set for group.');
-    var queryStr = "UPDATE {table} set group_id={group_id} where id in ({idList});"
+    var queryStr = "UPDATE {table} set group_id={group_id} where id in ({idList}) and user_id={user_id};"
         .format({
             table: contactsTable,
             group_id: group_id,
+            user_id: user_id,
             idList: idList.slice(0, -1)
         });
     exQuery(queryStr, null, callback);
@@ -164,9 +166,10 @@ function selectOne (tableName, columnName, value, callback) {
     select(queryStr, callback, 0);
 }
 
-function deleteOne (tableName, columnName, value, callback) {
-    var queryStr = "DELETE from {table} where {columnName}='{value}';".format({
+function deleteOne (tableName, columnName, value, user_id, callback) {
+    var queryStr = "DELETE from {table} where {columnName}='{value}' and user_id = {user_id};".format({
         table: tableName,
+        user_id: user_id,
         columnName: columnName,
         value: value
     });
@@ -174,7 +177,7 @@ function deleteOne (tableName, columnName, value, callback) {
 }
 
 function selectAllOrderBy (tableName, columnName, value, orderBy, callback) {
-    var queryStr = "SELECT * from {table} where {columnName}='{value} order by {orderBy}';".format({
+    var queryStr = "SELECT * from {table} where {columnName}='{value}' order by {orderBy};".format({
         table: tableName,
         columnName: columnName,
         value: value,
@@ -201,7 +204,7 @@ function select (queryStr, callback, rowNum) {
 function exQuery (queryStr, err, callback) {
     log.debug(queryStr);
     connection.query(queryStr, function (err, rows) {
-        log.warn('exQuery: ' + rows);
+        log.warn(rows); // affectedRows
         if (err) {
             if (err.code == 'ER_DUP_ENTRY' && err)
                 callback(err);

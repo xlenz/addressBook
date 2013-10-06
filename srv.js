@@ -208,7 +208,10 @@ app.post('/login', function (req, res, next) {
 app.post("/user/:id", function (req, res) {
     log.debug(req.headers.host + ' requests: ' + req.url);
     if (!req.isAuthenticated())
-        return res.redirect('/');
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
 
     if (req.params.id == 'me') {
         var map = {};
@@ -221,6 +224,164 @@ app.post("/user/:id", function (req, res) {
     return res.send({
         success: false,
         message: 'It is possible to view only currently logged in user.'
+    });
+});
+
+app.get("/allContacts", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    dbMysql.allContacts(req.user.id, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
+    });
+});
+
+app.post("/groupContacts", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    dbMysql.groupContacts(req.body.group_id, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
+    });
+});
+
+app.get("/userGroups", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    dbMysql.userGroups(req.user.id, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
+    });
+});
+
+app.post("/contactDelete", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    log.info(req.body);
+    dbMysql.contactDelete(req.body.id, req.user.id, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
+    });
+});
+
+app.post("/groupDelete", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    dbMysql.groupDelete(req.body.id, req.user.id, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
+    });
+});
+
+app.post("/groupCreate", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    dbMysql.groupCreate(req.user.id, req.body.name, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
+    });
+});
+
+app.post("/groupUpdate", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    dbMysql.groupUpdate(req.body.id, req.body.name, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
+    });
+});
+
+app.post("/contactCreate", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    var contact = {};
+    contact.user_id = req.user.id;
+    contact.group_id = req.body.groud_id;
+    contact.email = req.body.email;
+    contact.phone = req.body.phone;
+    contact.firstName = req.body.firstName;
+    contact.lastName = req.body.lastName;
+
+    dbMysql.contactCreate(contact, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
+    });
+});
+
+app.post("/contactUpdate", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    var contact = {};
+    contact.id = req.body.id;
+    contact.user_id = req.user.id;
+    contact.group_id = req.body.groud_id;
+    contact.email = req.body.email;
+    contact.phone = req.body.phone;
+    contact.firstName = req.body.firstName;
+    contact.lastName = req.body.lastName;
+
+    dbMysql.contactUpdate(contact, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
+    });
+});
+
+app.post("/contactSetGroup", function (req, res) {
+    if (!req.isAuthenticated())
+        return res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+    dbMysql.contactSetGroup(req.body.ids, req.body.group_id, req.user.id, function(err, data){
+        log.debug(err);
+        log.debug(data);
+        if (err) res.send(err);
+        else res.send(data);
     });
 });
 
