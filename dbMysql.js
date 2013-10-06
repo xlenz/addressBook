@@ -15,7 +15,7 @@ var contactsTable = 'contacts';
 
 var connection;
 
-function handleDisconnect() {
+function handleDisconnect () {
     connection = mysql.createConnection(dbConfig);
 
     connection.connect(function (err) {
@@ -38,11 +38,26 @@ function handleDisconnect() {
 setTimeout(handleDisconnect, 1000);
 
 exports.usrFindOne = function (map, callback) {
-    query(usersTable, 'login', map.username, callback);
+    selectOne(usersTable, 'login', map.username, callback);
 }
 
 exports.usrFindById = function (id, callback) {
-    query(usersTable, 'id', id, callback);
+    selectOne(usersTable, 'id', id, callback);
+}
+
+exports.allContacts = function (user_id, callback) {
+    var orderBy = 'firstName, lastName';
+    select(contactsTable, 'user_id', user_id, callback);
+}
+
+exports.groupContacts = function (group_id, callback) {
+    var orderBy = 'firstName, lastName';
+    select(contactsTable, 'group_id', group_id, callback);
+}
+
+exports.userGroups = function (user_id, callback) {
+    var orderBy = 'rank, name';
+    select(groupsTable, 'user_id', user_id, callback);
 }
 
 exports.usrCreate = function (username, pwd, callback) {
@@ -52,11 +67,15 @@ exports.usrCreate = function (username, pwd, callback) {
             login: username,
             pwd: pwd,
         });
+    insert(queryStr, 'User with login ' + username + ' already exists.', callback);
+}
+
+function insert (queryStr, err, callback) {
     log.debug(queryStr);
     connection.query(queryStr, function (err, rows, fields) {
         if (err) {
             if (err.code == 'ER_DUP_ENTRY')
-                callback('User with login ' + username + ' already exists.');
+                callback(err);
             else
                 callback(err.code);
         } else if (rows && rows.length > 0)
@@ -66,17 +85,34 @@ exports.usrCreate = function (username, pwd, callback) {
     });
 }
 
-function query(tableName, columnName, value, callback) {
-    var queryStr = "SELECT * from {tableName} where {columnName}='{value}'".format({
+function selectOne (tableName, columnName, value, callback) {
+    var queryStr = "SELECT * from {tableName} where {columnName}='{value};'".format({
         tableName: tableName,
         columnName: columnName,
         value: value
     });
+    select(queryStr, callback, 0);
+}
+
+function selectAllOrderBy (tableName, columnName, value, orderBy, callback) {
+    var queryStr = "SELECT * from {tableName} where {columnName}='{value} order by {orderBy};'".format({
+        tableName: tableName,
+        columnName: columnName,
+        value: value,
+        orderBy: orderBy
+    });
+    select(queryStr, callback);
+}
+
+function select (queryStr, callback, rowNum) {
     log.debug(queryStr);
     connection.query(queryStr, function (err, rows) {
         if (err) callback(err.code);
         else if (rows && rows.length > 0)
-            callback(null, rows[0]);
+            if (rowNum)
+                callback(null, rows[rowNum]);
+            else
+                callback(null, rows);
         else
             callback(null, null);
     });
