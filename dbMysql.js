@@ -37,8 +37,8 @@ function handleDisconnect () {
 
 setTimeout(handleDisconnect, 1000);
 
-exports.usrFindOne = function (map, callback) {
-    selectOne(usersTable, 'login', map.username, callback);
+exports.usrFindOne = function (username, callback) {
+    selectOne(usersTable, 'login', username, callback);
 }
 
 exports.usrFindById = function (id, callback) {
@@ -86,7 +86,7 @@ function insert (queryStr, err, callback) {
 }
 
 function selectOne (tableName, columnName, value, callback) {
-    var queryStr = "SELECT * from {tableName} where {columnName}='{value};'".format({
+    var queryStr = "SELECT * from {tableName} where {columnName}='{value}';".format({
         tableName: tableName,
         columnName: columnName,
         value: value
@@ -95,7 +95,7 @@ function selectOne (tableName, columnName, value, callback) {
 }
 
 function selectAllOrderBy (tableName, columnName, value, orderBy, callback) {
-    var queryStr = "SELECT * from {tableName} where {columnName}='{value} order by {orderBy};'".format({
+    var queryStr = "SELECT * from {tableName} where {columnName}='{value} order by {orderBy}';".format({
         tableName: tableName,
         columnName: columnName,
         value: value,
@@ -109,7 +109,7 @@ function select (queryStr, callback, rowNum) {
     connection.query(queryStr, function (err, rows) {
         if (err) callback(err.code);
         else if (rows && rows.length > 0)
-            if (rowNum)
+            if (rowNum != null)
                 callback(null, rows[rowNum]);
             else
                 callback(null, rows);

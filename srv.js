@@ -15,9 +15,8 @@ var passport = require('passport'),
 
 passport.use(new LocalStrategy(
     function (username, password, done) {
-        dbMysql.usrFindOne({
-            username: username
-        }, function (err, user) {
+        dbMysql.usrFindOne(username, function (err, user) {
+log.debug(user);
             if (err) {
                 return done(err);
             }
