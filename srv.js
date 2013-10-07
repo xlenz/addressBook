@@ -234,8 +234,6 @@ app.get("/allContacts", function (req, res) {
             message: 'You must be logged in.'
         });
     dbMysql.allContacts(req.user.id, function(err, data){
-        log.debug(err);
-        log.debug(data);
         if (err) res.send(err);
         else res.send(data);
     });
@@ -262,8 +260,6 @@ app.get("/userGroups", function (req, res) {
             message: 'You must be logged in.'
         });
     dbMysql.userGroups(req.user.id, function(err, data){
-        log.debug(err);
-        log.debug(data);
         if (err) res.send(err);
         else res.send(data);
     });

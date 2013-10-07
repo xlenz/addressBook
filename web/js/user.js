@@ -1,7 +1,10 @@
+var app = angular.module('myApp', []);
+
 var hostname = window.location.host;
+var groupNameTemplate = 'Group: {groupName}<b class="caret"></b>';
 
 $(document).ready(function () {
-    sendAjax('http://' + hostname + window.location.pathname, 'POST', {}, function (res) {
+    sendAjax('http://' + hostname + window.location.pathname, 'POST', null, function (res) {
         var list = $('#userProperties');
         if (!res.success)
             list.text(res.message);
@@ -17,11 +20,49 @@ $(document).ready(function () {
     });
 });
 
-$("#allContacts").click(function(event) {
-  event.preventDefault();
-  sendAjax('http://' + hostname + '/allContacts', 'GET', {}, function (res) {
-    console.log(res);
-  });
+/*
+$('#groupsDropdown a').click(function(event) {
+    console.log('here');
+    event.preventDefault();
+    var groupName = $(this).text();
+    $('#groupName').html(groupNameTemplate.format({groupName: groupName}));
+});
+*/
+app.controller('MainCtrl', function($scope, $http) {
+    $scope.contacts = [];
+    $scope.allContacts = function() {
+        $http.get('http://' + hostname + '/allContacts')
+          .then(function(res) {
+            $scope.contacts = res.data;
+        });
+    };
+    $scope.allContacts();
+
+    $scope.groupContacts = function(group_id) {
+        $http({
+                url: 'http://' + hostname + '/groupContacts',
+                method: "POST",
+                data: {group_id: group_id},
+                headers: {'Content-Type': 'application/json; charset=utf-8'}
+        }).success(function (data) {
+                    $scope.contacts = data;
+        });
+    };
+
+    $scope.groups = [];
+    $http.get('http://' + hostname + '/userGroups')
+      .then(function(res) {
+        $scope.groups = res.data;
+    });
+    $scope.group = {};
+    $scope.setGroup = function (g){
+        $scope.group = g;
+        if (g.id)
+            $scope.groupContacts(g.id);
+        else
+            $scope.allContacts();
+    };
+
 });
 
 $("#groupContacts").click(function(event) {
@@ -29,13 +70,6 @@ $("#groupContacts").click(function(event) {
   var dataObj = {};
   dataObj.group_id = 1;
   sendAjax('http://' + hostname + '/groupContacts', 'POST', dataObj, function (res) {
-    console.log(res);
-  });
-});
-
-$("#userGroups").click(function(event) {
-  event.preventDefault();
-  sendAjax('http://' + hostname + '/userGroups', 'GET', {}, function (res) {
     console.log(res);
   });
 });
@@ -115,18 +149,17 @@ $("#contactSetGroup").click(function(event) {
 });
 
 function sendAjax(url, type, dataObj, callback) {
-    setTimeout(function () {
-        $.ajax({
-            type: type,
-            url: url,
-            contentType: 'application/json; charset=utf-8',
-            //async: true,
-            data: JSON.stringify(dataObj),
-            success: function (res) {
-                callback(res);
-            }
-        })
-    }, 10);
+    var sendObj = {
+        type: type,
+        url: url,
+        contentType: 'application/json; charset=utf-8',
+        success: function (res) {
+            callback(res);
+        }
+    };
+    if (dataObj != null)
+        sendObj.data = JSON.stringify(dataObj);
+    $.ajax(sendObj);
 }
 
 if (!String.prototype.format) {

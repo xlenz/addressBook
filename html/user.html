@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="myApp">
   <head lang="en">
     <title>Development in progress</title>
     <meta charset="utf-8">
@@ -17,19 +17,20 @@
   </head>
 
 
-  <body>
+  <body ng-controller="MainCtrl">
 
     <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
 
       <div class="container">
         <ul class="nav navbar-nav">
           <li class="active dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Group: All Contacts<b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                Group: {{group.name || "All Contacts"}}<b class="caret"></b>
+            </a>
             <ul class="dropdown-menu">
-              <li><a href="#">All Contacts</a></li>
-              <li><a href="#">My Favourites</a></li>
+              <li><a href="" ng-click="setGroup({name: 'All Contacts'})">All Contacts</a></li>
               <li class="divider"></li>
-              <li><a href="#">user group 1</a></li>
+              <li ng-repeat="g in groups"><a href="" ng-cloak ng-click="setGroup(g)">{{g.name}}</a></li>
             </ul>
           </li>
         </ul>
@@ -39,11 +40,20 @@
       </div>
     </nav>
 
-    <div class="container">
-        <p>See console...</p>
-        <button id="allContacts" class="btn btn-info">allContacts</button>
-        <button id="groupContacts" class="btn btn-info">groupContacts</button>
-        <button id="userGroups" class="btn btn-info">userGroups</button>
+  <div>
+    <div>
+      <label>Search: </label>
+      <input type="search" ng-model="searchContacts">
+    </div>
+    <ul>
+       <li ng-repeat="contact in contacts | filter:searchContacts">
+        {{contact.firstName}} {{contact.lastName}}
+       </li>
+    </ul>
+  </div>
+
+    <!--div class="container">
+        <p>DEBUG ONLY! See console...</p>
         <button id="contactDelete" class="btn btn-info">contactDelete</button>
         <button id="groupDelete" class="btn btn-info">groupDelete</button>
         <button id="groupCreate" class="btn btn-info">groupCreate</button>
@@ -51,10 +61,11 @@
         <button id="contactCreate" class="btn btn-info">contactCreate</button>
         <button id="contactUpdate" class="btn btn-info">contactUpdate</button>
         <button id="contactSetGroup" class="btn btn-info">contactSetGroup</button>
-    </div>
+    </div-->
 
     <script src="../libs/jquery-2.0.3.min.js"></script>
+    <script src="../libs/angular.min.js"></script>
     <script src="../libs/bootstrap/js/bootstrap.min.js"></script>
-  <script src="../js/user.js"></script>
+    <script src="../js/user.js"></script>
   </body>
 </html>

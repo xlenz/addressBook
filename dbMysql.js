@@ -204,14 +204,14 @@ function select (queryStr, callback, rowNum) {
 function exQuery (queryStr, err, callback) {
     log.debug(queryStr);
     connection.query(queryStr, function (err, rows) {
-        log.warn(rows); // affectedRows
+        log.warn(rows); // affectedRows //insertId
         if (err) {
             if (err.code == 'ER_DUP_ENTRY' && err)
                 callback(err);
             else
                 callback(err.code);
-        } else if (rows && rows.length > 0)
-            callback(null, rows.insertId);
+        } else if (rows && rows.affectedRows > 0)
+            callback(null, rows);
         else
             callback(null, null);
     });
