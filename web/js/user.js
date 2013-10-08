@@ -48,6 +48,10 @@ app.controller('MainCtrl', function($scope, $http) {
                     $scope.contacts = data;
         });
     };
+    $scope.contact = {};
+    $scope.setContact = function (c){
+        $scope.contact = c;
+    };
 
     $scope.groups = [];
     $http.get('http://' + hostname + '/userGroups')
@@ -55,23 +59,38 @@ app.controller('MainCtrl', function($scope, $http) {
         $scope.groups = res.data;
     });
     $scope.group = {};
-    $scope.setGroup = function (g){
-        $scope.group = g;
-        if (g.id)
-            $scope.groupContacts(g.id);
+    $scope.setGroup = function (){
+        if ($scope.group)
+            $scope.groupContacts($scope.group.id);
         else
             $scope.allContacts();
     };
 
-});
+    $scope.contactGroup = {};
+    $scope.findGroupById = function (group_id){
+        for (var key in $scope.groups)
+            if ($scope.groups[key].id == group_id) {
+                $scope.contactGroup = $scope.groups[key];
+                return;
+            }
+        $scope.contactGroup = {};
+    };
 
-$("#groupContacts").click(function(event) {
-  event.preventDefault();
-  var dataObj = {};
-  dataObj.group_id = 1;
-  sendAjax('http://' + hostname + '/groupContacts', 'POST', dataObj, function (res) {
-    console.log(res);
-  });
+    $scope.contactDelete = function (contact_id) {
+        if (confirm('Do you really want to delete this contact?'))
+            $http({
+                    url: 'http://' + hostname + '/contactDelete',
+                    method: "POST",
+                    data: {id: contact_id},
+                    headers: {'Content-Type': 'application/json; charset=utf-8'}
+            }).success(function (data) {
+                    if ($scope.group.id)
+                        $scope.groupContacts($scope.group.id);
+                    else
+                        $scope.allContacts();
+            });
+    };
+
 });
 
 $("#contactDelete").click(function(event) {
