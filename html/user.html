@@ -31,6 +31,11 @@
         </td>
         <td width="20px">
             <p class="text-left" style="margin-top:15px">
+                <a href=""><span class="text-success glyphicon glyphicon-plus"></span></a>
+            </p>
+        </td>
+        <td width="20px">
+            <p class="text-left" style="margin-top:15px">
                 <a href=""><span class="text-warning glyphicon glyphicon-pencil"></span></a>
             </p>
         </td>
@@ -40,11 +45,9 @@
             </p>
         </td>
         <td>
-          <p class="text-right">
           <form class="navbar-form navbar-right" action="/logout" method="GET">
             <button type="submit" class="btn btn-warning">Log out</button>
           </form>
-          </p>
         </td>
       </tr>
     </table>
@@ -58,17 +61,17 @@
               <thead>
                 <tr>
                   <th>Contacts</th>
-                  <th><a href="" >
+                  <th><a href="" ng-show="contactView" ng-hide="contactCreate" ng-click="createContact();">
                     <span class="text-success glyphicon glyphicon-plus"></span>
                     </a>
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr ng-repeat="c in contacts | filter:searchContacts">
+                <tr ng-repeat="c in contacts | filter:searchContacts" class="{{selectedContact(c.id)}}">
                   <td ng-cloak ng-click="setContact(c); findGroupById(c.group_id)">{{c.firstName}} {{c.lastName}}</td>
                   <td><a href="" ng-click="contactDelete(c.id);">
-                    <span class="text-danger glyphicon glyphicon-remove"></span>
+                    <span ng-show="contactView" class="text-danger glyphicon glyphicon-remove"></span>
                     </a>
                   </td>
                 </tr>
@@ -79,11 +82,12 @@
             <div class="panel panel-info">
               <div class="panel-heading">
                 <h1 class="panel-title">
-                  {{contact.firstName || "Contact"}} {{contact.lastName || "Info"}}
+                  <nobr ng-show="contactCreate">Create new contact</nobr>
+                  <nobr ng-hide="contactCreate">{{contact.firstName || "Contact"}} {{contact.lastName || "details here..."}}</nobr>
                 </h1>
               </div>
               <div class="panel-body">
-                <dl class="dl-horizontal">
+                <dl class="dl-horizontal" id="contactView" ng-show="contactView">
                   <dt>First Name:</dt>
                   <dd>{{contact.firstName || ""}}</dd>
                   <dt>Last Name:</dt>
@@ -93,16 +97,28 @@
                   <dt>Email:</dt>
                   <dd>{{contact.email || ""}}</dd>
                   <dt>Group:</dt>
-                  <dd>{{contactGroup.name || "All Contacts"}}</dd>
-                  <dt hidden>Group: </dt>
-                  <dd hidden>
-                    <select class="form-control" style="width: 300px">
-                      <option ng-cloak ng-repeat="g in groups">{{g.name}}</option>
+                  <dd ng-hide="!contact.id">{{contactGroup.name || "All Contacts"}}</dd>
+                </dl>
+                <dl class="dl-horizontal" id="contactEdit" ng-hide="contactView">
+                  <dt>First Name:</dt>
+                  <dd><input class="form-control" placeholder="First Name" ng-model="newContact.firstName"></dd>
+                  <dt>Last Name:</dt>
+                  <dd><input class="form-control" placeholder="Last Name" ng-model="newContact.lastName"></dd>
+                  <dt>Phone:</dt>
+                  <dd><input class="form-control" placeholder="Phone" ng-model="newContact.phone"></dd>
+                  <dt>Email:</dt>
+                  <dd><input class="form-control" placeholder="Email" ng-model="newContact.email"></dd>
+                  <dt>Group:</dt>
+                  <dd>
+                    <select class="form-control" style="width: 300px" ng-model="contactGroup" ng-options="g.name for g in groups">
+                        <option value="">All Contacts<option>
                     </select>
                   </dd>
                 </dl>
                 <p class="text-right">
-                  <button class="btn btn-info">Edit</button>
+                  <button class="btn btn-success" ng-click="saveContact()" ng-hide="contactView">Save</button>
+                  <button class="btn btn-danger" ng-click="cancelContact()" ng-hide="contactView">Cancel</button>
+                  <button class="btn btn-info" ng-disabled="!contact.id" ng-click="contactView=false;newContact=contact;" ng-show="contactView">Edit</button>
                 </p>
               </div>
             </div>
@@ -110,32 +126,14 @@
         </tr>
       </tbody>
     </table>
-    <hr/>
-    <div class="container">
-      <p class="text-left"><button class="btn btn-info">Add Contact</button></p>
-    </div>
-    <!--div>
-      <div>
-        <label>Search: </label>
-        <input type="search" ng-model="searchContacts">
-      </div>
-      <ul>
-         <li ng-repeat="contact in contacts | filter:searchContacts">
-          {{contact.firstName}} {{contact.lastName}}
-         </li>
-      </ul>
-      </div>
 
-      <div class="container">
-          <p>DEBUG ONLY! See console...</p>
-          <button id="contactDelete" class="btn btn-info">contactDelete</button>
-          <button id="groupDelete" class="btn btn-info">groupDelete</button>
-          <button id="groupCreate" class="btn btn-info">groupCreate</button>
-          <button id="groupUpdate" class="btn btn-info">groupUpdate</button>
-          <button id="contactCreate" class="btn btn-info">contactCreate</button>
-          <button id="contactUpdate" class="btn btn-info">contactUpdate</button>
-          <button id="contactSetGroup" class="btn btn-info">contactSetGroup</button>
+      <!--div class="container">
+          <p class="text-left">DEBUG ONLY!
+            <button id="groupCreate" class="btn btn-primary">groupCreate</button>
+            <button id="groupUpdate" class="btn btn-primary">groupUpdate</button>
+          </p>
       </div-->
+
     <script src="../libs/jquery-2.0.3.min.js"></script>
     <script src="../libs/angular.min.js"></script>
     <script src="../libs/bootstrap/js/bootstrap.min.js"></script>

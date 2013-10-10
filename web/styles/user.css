@@ -1,1 +1,1 @@
-table-striped tbody tr.highlight td { background-color: red; }
+table tbody tr.selectedContact { background-color: #e0f0f0; }

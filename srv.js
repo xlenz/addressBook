@@ -55,7 +55,7 @@ app.configure(function () {
     app.use(express.session({
         secret: 'task js course',
         cookie: {
-            maxAge: 10080000 //one week, one hour - 3600000
+            maxAge: 604800000 //one week, one hour - 3600000
         },
         store: new MongoStore(tools.mongo)
     }));

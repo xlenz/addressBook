@@ -29,6 +29,12 @@ $('#groupsDropdown a').click(function(event) {
 });
 */
 app.controller('MainCtrl', function($scope, $http) {
+    $scope.contactView = true;
+    $scope.contactCreate = false;
+    $scope.contactInputValue = function (){
+        if (!$scope.contactCreate)
+            return $scope.contact;
+    };
     $scope.contacts = [];
     $scope.allContacts = function() {
         $http.get('http://' + hostname + '/allContacts')
@@ -50,8 +56,16 @@ app.controller('MainCtrl', function($scope, $http) {
     };
     $scope.contact = {};
     $scope.setContact = function (c){
-        $scope.contact = c;
+        if ($scope.contactView)
+            $scope.contact = c;
     };
+
+    $scope.selectedContact = function (c_id) {
+        if ($scope.contact.id == c_id)
+            return 'selectedContact';
+        else
+            return '';
+    }
 
     $scope.groups = [];
     $http.get('http://' + hostname + '/userGroups')
@@ -68,6 +82,7 @@ app.controller('MainCtrl', function($scope, $http) {
 
     $scope.contactGroup = {};
     $scope.findGroupById = function (group_id){
+        if (!$scope.contactView) return;
         for (var key in $scope.groups)
             if ($scope.groups[key].id == group_id) {
                 $scope.contactGroup = $scope.groups[key];
@@ -75,6 +90,31 @@ app.controller('MainCtrl', function($scope, $http) {
             }
         $scope.contactGroup = {};
     };
+
+    $scope.newContact = {};
+    $scope.saveContact = function () {
+        //$scope.contactView=true;
+        var group_id = $scope.contactGroup ? $scope.contactGroup.name : 'All Contacts';
+        alert($scope.newContact.firstName +'  ' + group_id);
+    };
+
+    $scope.cancelContact = function () {
+        $scope.contactView=true;
+        $scope.findGroupById($scope.contact.group_id);
+    };
+
+    $scope.createContact = function () {
+        $scope.contactCreate=true;
+        $scope.contactView=false;
+        $scope.contactGroup = null;
+    };
+
+    $scope.selectedGroup = function () {
+        if (!$scope.contactCreate)
+            return contactGroup;
+        else
+            return null;
+    }
 
     $scope.contactDelete = function (contact_id) {
         if (confirm('Do you really want to delete this contact?'))
