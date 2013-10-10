@@ -141,22 +141,6 @@ exports.contactUpdate = function (contact, callback) {
     exQuery(queryStr, null, callback);
 }
 
-exports.contactSetGroup = function (ids, group_id, user_id, callback) {
-    var idList = '';
-    for (var key in ids) {
-        idList += ids[key] + ',';
-    }
-    if (idList == '') return callback ('No contacts to be set for group.');
-    var queryStr = "UPDATE {table} set group_id={group_id} where id in ({idList}) and user_id={user_id};"
-        .format({
-            table: contactsTable,
-            group_id: group_id,
-            user_id: user_id,
-            idList: idList.slice(0, -1)
-        });
-    exQuery(queryStr, null, callback);
-}
-
 function selectOne (tableName, columnName, value, callback) {
     var queryStr = "SELECT * from {table} where {columnName}='{value}';".format({
         table: tableName,
@@ -229,3 +213,20 @@ if (!String.prototype.format) {
         return str;
     }
 }
+/*
+exports.contactSetGroup = function (ids, group_id, user_id, callback) {
+    var idList = '';
+    for (var key in ids) {
+        idList += ids[key] + ',';
+    }
+    if (idList == '') return callback ('No contacts to be set for group.');
+    var queryStr = "UPDATE {table} set group_id={group_id} where id in ({idList}) and user_id={user_id};"
+        .format({
+            table: contactsTable,
+            group_id: group_id,
+            user_id: user_id,
+            idList: idList.slice(0, -1)
+        });
+    exQuery(queryStr, null, callback);
+}
+*/

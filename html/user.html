@@ -24,28 +24,33 @@
             <dd style="margin-left:60px">
               <select class="form-control" style="max-width: 300px" ng-model="group" ng-options="g.name for g in groups" ng-change="setGroup()">
                 <option value="">All Contacts</option>
-                <!--option ng-cloak ng-repeat="g in groups" ng-cloak ng-click="setGroup(g)">{{g.name}}</option-->
               </select>
             </dd>
           </dl>
         </td>
         <td width="20px">
             <p class="text-left" style="margin-top:15px">
-                <a href=""><span class="text-success glyphicon glyphicon-plus"></span></a>
+                <a href="" ng-click="createGroup()"><span class="text-success glyphicon glyphicon-plus"></span></a>
             </p>
         </td>
         <td width="20px">
             <p class="text-left" style="margin-top:15px">
-                <a href=""><span class="text-warning glyphicon glyphicon-pencil"></span></a>
+                <a href="" ng-click="editGroup()"><span class="text-warning glyphicon glyphicon-pencil"></span></a>
+            </p>
+        </td>
+        <td width="20px">
+            <p class="text-left" style="margin-top:15px">
+                <a href="" ng-click="deleteGroup()"><span class="text-danger glyphicon glyphicon-remove"></span></a>
             </p>
         </td>
         <td>
-            <p class="text-left" style="margin-top:15px">
-                <a href="" ><span class="text-danger glyphicon glyphicon-remove"></span></a>
-            </p>
+            <div class="alert alert-danger" ng-show="groupError.show">
+                {{groupError.msg}}
+            </div>
         </td>
         <td>
           <form class="navbar-form navbar-right" action="/logout" method="GET">
+            <nobr class="text-primary"><strong>{{user.login}}</strong></nobr>
             <button type="submit" class="btn btn-warning">Log out</button>
           </form>
         </td>
@@ -61,7 +66,7 @@
               <thead>
                 <tr>
                   <th>Contacts</th>
-                  <th><a href="" ng-show="contactView" ng-hide="contactCreate" ng-click="createContact();">
+                  <th><a href="" ng-show="contactView" ng-click="createContact();">
                     <span class="text-success glyphicon glyphicon-plus"></span>
                     </a>
                   </th>
@@ -82,12 +87,12 @@
             <div class="panel panel-info">
               <div class="panel-heading">
                 <h1 class="panel-title">
-                  <nobr ng-show="contactCreate">Create new contact</nobr>
-                  <nobr ng-hide="contactCreate">{{contact.firstName || "Contact"}} {{contact.lastName || "details here..."}}</nobr>
+                  <nobr ng-show="contactCreateView">Create new contact</nobr>
+                  <nobr ng-hide="contactCreateView">{{contact.firstName || "Contact"}} {{contact.lastName || "details here..."}}</nobr>
                 </h1>
               </div>
               <div class="panel-body">
-                <dl class="dl-horizontal" id="contactView" ng-show="contactView">
+                <dl class="dl-horizontal" ng-show="contactView">
                   <dt>First Name:</dt>
                   <dd>{{contact.firstName || ""}}</dd>
                   <dt>Last Name:</dt>
@@ -99,7 +104,7 @@
                   <dt>Group:</dt>
                   <dd ng-hide="!contact.id">{{contactGroup.name || "All Contacts"}}</dd>
                 </dl>
-                <dl class="dl-horizontal" id="contactEdit" ng-hide="contactView">
+                <dl class="dl-horizontal" ng-hide="contactView">
                   <dt>First Name:</dt>
                   <dd><input class="form-control" placeholder="First Name" ng-model="newContact.firstName"></dd>
                   <dt>Last Name:</dt>
@@ -115,10 +120,13 @@
                     </select>
                   </dd>
                 </dl>
+                <div class="alert alert-danger" ng-show="groupError.show">
+                    {{groupError.msg}}
+                </div>
                 <p class="text-right">
                   <button class="btn btn-success" ng-click="saveContact()" ng-hide="contactView">Save</button>
                   <button class="btn btn-danger" ng-click="cancelContact()" ng-hide="contactView">Cancel</button>
-                  <button class="btn btn-info" ng-disabled="!contact.id" ng-click="contactView=false;newContact=contact;" ng-show="contactView">Edit</button>
+                  <button class="btn btn-info" ng-disabled="!contact.id" ng-click="editContact()" ng-show="contactView">Edit</button>
                 </p>
               </div>
             </div>
@@ -127,14 +135,8 @@
       </tbody>
     </table>
 
-      <!--div class="container">
-          <p class="text-left">DEBUG ONLY!
-            <button id="groupCreate" class="btn btn-primary">groupCreate</button>
-            <button id="groupUpdate" class="btn btn-primary">groupUpdate</button>
-          </p>
-      </div-->
-
     <script src="../libs/jquery-2.0.3.min.js"></script>
+    <script src="../libs/bootbox.min.js"></script>
     <script src="../libs/angular.min.js"></script>
     <script src="../libs/bootstrap/js/bootstrap.min.js"></script>
     <script src="../js/user.js"></script>

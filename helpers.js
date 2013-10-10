@@ -40,6 +40,12 @@ exports.validateInput = function (s) {
     return null;
 }
 
+exports.validatePhone = function (s) {
+    log.trace('validateInput: ' + s);
+    var re = /^([0-9~()\s+-]+)$/;
+    return re.test(email);
+}
+
 /*
 exports.verifyInteger = function (val) {
     var intRegex = /^-{0,1}\d*\.{0,1}\d+$/;
