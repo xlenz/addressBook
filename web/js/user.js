@@ -35,17 +35,15 @@ app.controller('MainCtrl', function($scope, $http) {
         var group_id = $scope.contactGroup ? $scope.contactGroup.id : null;
         $scope.newContact.group_id = group_id;
         if ($scope.contactCreateView)
-            scope.contactCreate($scope.newContact)
+            $scope.contactCreate($scope.newContact)
         else {
             $scope.contactUpdate($scope.newContact);
             $scope.contact = clone($scope.newContact);
         }
-        $scope.newContact = {};
-        $scope.contactView=true;
-        $scope.contactCreateView = false;
     };
 
     $scope.cancelContact = function () {
+        $scope.contactError.show = false;
         $scope.contactView=true;
         $scope.contactCreateView = false;
         $scope.newContact = {};
@@ -120,7 +118,7 @@ app.controller('MainCtrl', function($scope, $http) {
                 method: "POST",
                 headers: {'Content-Type': 'application/json; charset=utf-8'}
         }).success(function (data) {
-                    $scope.user = data.user;
+            $scope.user = data.user;
         });
     };
 
@@ -147,10 +145,7 @@ app.controller('MainCtrl', function($scope, $http) {
                     data: {id: contact_id},
                     headers: {'Content-Type': 'application/json; charset=utf-8'}
             }).success(function (data) {
-                    if ($scope.group && $scope.group.id)
-                        $scope.groupContacts($scope.group.id);
-                    else
-                        $scope.allContacts();
+                $scope.refreshContacts(data);
             });
         });
     };
@@ -173,7 +168,7 @@ app.controller('MainCtrl', function($scope, $http) {
                 data: {name: name},
                 headers: {'Content-Type': 'application/json; charset=utf-8'}
         }).success(function (data) {
-                $scope.allGroups();
+            $scope.verifyGroupResponse(data);
         });
     };
 
@@ -184,7 +179,7 @@ app.controller('MainCtrl', function($scope, $http) {
                 data: {id: group_id, name: name},
                 headers: {'Content-Type': 'application/json; charset=utf-8'}
         }).success(function (data) {
-                $scope.allGroups();
+            $scope.verifyGroupResponse(data);
         });
     };
 
@@ -206,10 +201,7 @@ app.controller('MainCtrl', function($scope, $http) {
                 data: contact,
                 headers: {'Content-Type': 'application/json; charset=utf-8'}
         }).success(function (data) {
-                    if ($scope.group && $scope.group.id)
-                        $scope.groupContacts($scope.group.id);
-                    else
-                        $scope.allContacts();
+            $scope.verifyContactResponse(data);
         });
     };
 
@@ -220,11 +212,41 @@ app.controller('MainCtrl', function($scope, $http) {
                 data: contact,
                 headers: {'Content-Type': 'application/json; charset=utf-8'}
         }).success(function (data) {
-                    if ($scope.group && $scope.group.id)
-                        $scope.groupContacts($scope.group.id);
-                    else
-                        $scope.allContacts();
+            $scope.verifyContactResponse(data);
         });
+    };
+
+    /********** post/get tools **********/
+    $scope.verifyGroupResponse = function (data) {
+        if (data.success == false) {
+            $scope.groupError.msg = data.message;
+            $scope.groupError.show = true;
+        }
+        else {
+            $scope.allGroups();
+            $scope.groupError.show = false;
+        }
+    };
+
+    $scope.verifyContactResponse = function (data) {
+        if (data.success == false) {
+            $scope.contactError.msg = data.message;
+            $scope.contactError.show = true;
+        }
+        else {
+            $scope.refreshContacts(data);
+            $scope.contactError.show = false;
+            $scope.newContact = {};
+            $scope.contactView = true;
+            $scope.contactCreateView = false;
+        }
+    };
+
+    $scope.refreshContacts = function (data) {
+        if ($scope.group && $scope.group.id)
+            $scope.groupContacts($scope.group.id);
+        else
+            $scope.allContacts();
     };
 
     /********** init **********/

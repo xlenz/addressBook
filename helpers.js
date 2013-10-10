@@ -43,7 +43,7 @@ exports.validateInput = function (s) {
 exports.validatePhone = function (s) {
     log.trace('validateInput: ' + s);
     var re = /^([0-9~()\s+-]+)$/;
-    return re.test(email);
+    return re.test(s);
 }
 
 /*

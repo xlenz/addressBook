@@ -185,13 +185,12 @@ function select (queryStr, callback, rowNum) {
     });
 }
 
-function exQuery (queryStr, err, callback) {
+function exQuery (queryStr, errMessage, callback) {
     log.debug(queryStr);
-    connection.query(queryStr, function (err, rows) {
-        log.warn(rows); // affectedRows //insertId
+    connection.query(queryStr, function (err, rows) { // affectedRows //insertId
         if (err) {
-            if (err.code == 'ER_DUP_ENTRY' && err)
-                callback(err);
+            if (err.code == 'ER_DUP_ENTRY' && errMessage)
+                callback(errMessage);
             else
                 callback(err.code);
         } else if (rows && rows.affectedRows > 0)

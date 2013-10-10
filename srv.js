@@ -303,7 +303,7 @@ app.post("/groupCreate", function (req, res) {
 
     var errors = [];
     if (!helpers.validateInput(req.body.name))
-        errors.push('Proper login is required');
+        errors.push('Proper name is required');
     if (errors.length > 0) {
         return res.send({
             success: false,
@@ -329,7 +329,7 @@ app.post("/groupUpdate", function (req, res) {
 
     var errors = [];
     if (!helpers.validateInput(req.body.name))
-        errors.push('Proper login is required');
+        errors.push('Proper name is required');
     if (errors.length > 0) {
         return res.send({
             success: false,
@@ -352,6 +352,7 @@ app.post("/contactCreate", function (req, res) {
             success: false,
             message: 'You must be logged in.'
         });
+
     var errors = [];
     if (!helpers.validateInput(req.body.firstName))
         errors.push('First Name is invalid');
@@ -360,7 +361,7 @@ app.post("/contactCreate", function (req, res) {
     if (req.body.email && !helpers.validateEmail(req.body.email))
         errors.push('Email is invalid');
     if (req.body.phone && !helpers.validatePhone(req.body.phone))
-        errors.push('Email is invalid');
+        errors.push('Phone is invalid');
 
     if (errors.length > 0) {
         return res.send({
@@ -368,7 +369,9 @@ app.post("/contactCreate", function (req, res) {
             message: errors
         });
     }
+
     var contact = {};
+    contact.id = req.body.id;
     contact.user_id = req.user.id;
     contact.group_id = req.body.group_id;
     contact.email = req.body.email;
@@ -400,7 +403,7 @@ app.post("/contactUpdate", function (req, res) {
     if (req.body.email && !helpers.validateEmail(req.body.email))
         errors.push('Email is invalid');
     if (req.body.phone && !helpers.validatePhone(req.body.phone))
-        errors.push('Email is invalid');
+        errors.push('Phone is invalid');
 
     if (errors.length > 0) {
         return res.send({

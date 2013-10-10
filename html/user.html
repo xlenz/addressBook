@@ -46,6 +46,7 @@
         <td>
             <div class="alert alert-danger" ng-show="groupError.show">
                 {{groupError.msg}}
+                <a href="" ng-click="groupError.show=false"><span class="text-danger glyphicon glyphicon-remove-circle pull-right"></span></a>
             </div>
         </td>
         <td>
@@ -120,8 +121,8 @@
                     </select>
                   </dd>
                 </dl>
-                <div class="alert alert-danger" ng-show="groupError.show">
-                    {{groupError.msg}}
+                <div class="alert alert-danger" ng-show="contactError.show">
+                    {{contactError.msg}}
                 </div>
                 <p class="text-right">
                   <button class="btn btn-success" ng-click="saveContact()" ng-hide="contactView">Save</button>
