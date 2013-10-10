@@ -108,10 +108,10 @@ exports.contactCreate = function (contact, callback) {
             table: contactsTable,
             user_id: contact.user_id,
             group_id: contact.group_id || null,
-            email: contact.email,
-            phone: contact.phone,
+            email: contact.email || null,
+            phone: contact.phone || null,
             firstName: contact.firstName,
-            lastName: contact.lastName
+            lastName: contact.lastName || null
         });
     exQuery(queryStr, null, callback);
 }
