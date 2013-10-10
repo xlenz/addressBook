@@ -84,6 +84,7 @@ app.controller('MainCtrl', function($scope, $http) {
         bootbox.confirm("Do you really want to delete '" + $scope.group.name + "' group?", function(result) {
             if (!result) return;
             $scope.groupDelete($scope.group.id);
+            $scope.group = {};
         });
     };
 
