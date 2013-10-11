@@ -304,6 +304,8 @@ app.post("/groupCreate", function (req, res) {
     var errors = [];
     if (!helpers.validateInput(req.body.name))
         errors.push('Proper name is required');
+    if (req.body.name.length > 30)
+        errors.push('Group name should be less then 30 symbols');
     if (errors.length > 0) {
         return res.send({
             success: false,
@@ -311,7 +313,7 @@ app.post("/groupCreate", function (req, res) {
         });
     }
 
-    dbMysql.groupCreate(req.user.id, req.body.name, function(err, data){
+    dbMysql.groupCreate(req.user.id, helpers.trim(req.body.name), function(err, data){
         if (err) res.send({
             success: false,
             message: err
@@ -328,8 +330,11 @@ app.post("/groupUpdate", function (req, res) {
         });
 
     var errors = [];
+
     if (!helpers.validateInput(req.body.name))
         errors.push('Proper name is required');
+    if (req.body.name.length > 30)
+        errors.push('Group name should be less then 30 symbols');
     if (errors.length > 0) {
         return res.send({
             success: false,
@@ -337,7 +342,7 @@ app.post("/groupUpdate", function (req, res) {
         });
     }
 
-    dbMysql.groupUpdate(req.body.id, req.body.name, function(err, data){
+    dbMysql.groupUpdate(req.body.id, helpers.trim(req.body.name), function(err, data){
         if (err) res.send({
             success: false,
             message: err

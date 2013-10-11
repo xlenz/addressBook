@@ -11,10 +11,13 @@ exports.validateEmail = function (email) {
 
 function trim(s) {
     log.trace('trim: ' + s);
-    s = s.replace(/(^\s*)|(\s*$)/gi, "");
-    s = s.replace(/[ ]{2,}/gi, " ");
-    s = s.replace(/\n /, "\n");
+    s = s.toString().replace(/(^\s*)|(\s*$)/gi, "");
+    s = s.toString().replace(/[ ]{2,}/gi, " ");
+    s = s.toString().replace(/\n /, "\n");
     return s;
+}
+exports.trim = function(s) {
+    return trim(s);
 }
 
 exports.validatePassword = function (s) {

@@ -1,10 +1,13 @@
 var mysql = require('mysql');
+var helpers = require('./helpers.js');
 
 var log;
 var dbConfig = {};
 exports.logger = function (srvLog) {
     log = srvLog
 }
+helpers.logger(log);
+
 exports.dbConfig = function (srvMysql) {
     dbConfig = srvMysql
 }
@@ -101,7 +104,7 @@ exports.groupUpdate = function (id, name, callback) {
 exports.contactCreate = function (contact, callback) {
     for (var key in contact) {
         if (contact[key] != null)
-            contact[key] = "'" + contact[key] + "'";
+            contact[key] = "'" + helpers.trim(contact[key]) + "'";
     }
     var queryStr = "INSERT INTO {table} (`user_id`, `group_id`, `email`, `phone`, `firstName`, `lastName`) VALUES ({user_id}, {group_id}, {email}, {phone}, {firstName}, {lastName});"
         .format({
@@ -128,7 +131,7 @@ exports.contactUpdate = function (contact, callback) {
     }
     for (var key in contact) {
         if (contact[key] != null)
-            set += ' ' + key + " = '" + contact[key] + "',";
+            set += ' ' + key + " = '" + helpers.trim(contact[key]) + "',";
     }
     if (set == '') return callback ('Nothing to update in contact.');
     var queryStr = "UPDATE {table} set{set} where id = {id} and user_id = {user_id};"

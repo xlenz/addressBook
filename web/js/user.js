@@ -1,6 +1,10 @@
 var app = angular.module('myApp', []);
 var hostname = window.location.host;
 
+$(document).ready(function() {
+    $('input').attr('maxlength', 45);
+});
+
 app.controller('MainCtrl', function($scope, $http) {
     /********** user **********/
     $scope.user = {};
@@ -66,8 +70,8 @@ app.controller('MainCtrl', function($scope, $http) {
 
     $scope.createGroup = function () {
         bootbox.prompt('Create new group', function(result) {
-          if (result === null) return;
-          $scope.groupCreate(result);
+            if (result === null) return;
+            $scope.groupCreate(result);
         });
     };
 
