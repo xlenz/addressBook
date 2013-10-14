@@ -16,7 +16,7 @@ function trim(s) {
     s = s.toString().replace(/\n /, "\n");
     return s;
 }
-exports.trim = function(s) {
+exports.trim = function (s) {
     return trim(s);
 }
 

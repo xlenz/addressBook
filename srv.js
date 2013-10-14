@@ -233,7 +233,7 @@ app.get("/allContacts", function (req, res) {
             success: false,
             message: 'You must be logged in.'
         });
-    dbMysql.allContacts(req.user.id, function(err, data){
+    dbMysql.allContacts(req.user.id, function (err, data) {
         if (err) res.send(err);
         else res.send(data);
     });
@@ -245,7 +245,7 @@ app.post("/groupContacts", function (req, res) {
             success: false,
             message: 'You must be logged in.'
         });
-    dbMysql.groupContacts(req.body.group_id, function(err, data){
+    dbMysql.groupContacts(req.body.group_id, function (err, data) {
         if (err) res.send(err);
         else res.send(data);
     });
@@ -257,7 +257,7 @@ app.get("/userGroups", function (req, res) {
             success: false,
             message: 'You must be logged in.'
         });
-    dbMysql.userGroups(req.user.id, function(err, data){
+    dbMysql.userGroups(req.user.id, function (err, data) {
         if (err) res.send(err);
         else res.send(data);
     });
@@ -270,7 +270,7 @@ app.post("/contactDelete", function (req, res) {
             message: 'You must be logged in.'
         });
     log.info(req.body);
-    dbMysql.contactDelete(req.body.id, req.user.id, function(err, data){
+    dbMysql.contactDelete(req.body.id, req.user.id, function (err, data) {
         if (err) res.send({
             success: false,
             message: err
@@ -285,7 +285,7 @@ app.post("/groupDelete", function (req, res) {
             success: false,
             message: 'You must be logged in.'
         });
-    dbMysql.groupDelete(req.body.id, req.user.id, function(err, data){
+    dbMysql.groupDelete(req.body.id, req.user.id, function (err, data) {
         if (err) res.send({
             success: false,
             message: err
@@ -313,7 +313,7 @@ app.post("/groupCreate", function (req, res) {
         });
     }
 
-    dbMysql.groupCreate(req.user.id, helpers.trim(req.body.name), function(err, data){
+    dbMysql.groupCreate(req.user.id, helpers.trim(req.body.name), function (err, data) {
         if (err) res.send({
             success: false,
             message: err
@@ -342,7 +342,7 @@ app.post("/groupUpdate", function (req, res) {
         });
     }
 
-    dbMysql.groupUpdate(req.body.id, helpers.trim(req.body.name), function(err, data){
+    dbMysql.groupUpdate(req.body.id, helpers.trim(req.body.name), function (err, data) {
         if (err) res.send({
             success: false,
             message: err
@@ -384,7 +384,7 @@ app.post("/contactCreate", function (req, res) {
     contact.firstName = req.body.firstName;
     contact.lastName = req.body.lastName;
 
-    dbMysql.contactCreate(contact, function(err, data){
+    dbMysql.contactCreate(contact, function (err, data) {
         if (err) res.send({
             success: false,
             message: err
@@ -426,7 +426,7 @@ app.post("/contactUpdate", function (req, res) {
     contact.firstName = req.body.firstName;
     contact.lastName = req.body.lastName;
 
-    dbMysql.contactUpdate(contact, function(err, data){
+    dbMysql.contactUpdate(contact, function (err, data) {
         if (err) res.send({
             success: false,
             message: err

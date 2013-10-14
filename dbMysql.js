@@ -18,7 +18,7 @@ var contactsTable = 'contacts';
 
 var connection;
 
-function handleDisconnect () {
+function handleDisconnect() {
     connection = mysql.createConnection(dbConfig);
 
     connection.connect(function (err) {
@@ -133,7 +133,7 @@ exports.contactUpdate = function (contact, callback) {
         if (contact[key] != null)
             set += ' ' + key + " = '" + helpers.trim(contact[key]) + "',";
     }
-    if (set == '') return callback ('Nothing to update in contact.');
+    if (set == '') return callback('Nothing to update in contact.');
     var queryStr = "UPDATE {table} set{set} where id = {id} and user_id = {user_id};"
         .format({
             table: contactsTable,
@@ -144,7 +144,7 @@ exports.contactUpdate = function (contact, callback) {
     exQuery(queryStr, null, callback);
 }
 
-function selectOne (tableName, columnName, value, callback) {
+function selectOne(tableName, columnName, value, callback) {
     var queryStr = "SELECT * from {table} where {columnName}='{value}';".format({
         table: tableName,
         columnName: columnName,
@@ -153,7 +153,7 @@ function selectOne (tableName, columnName, value, callback) {
     select(queryStr, callback, 0);
 }
 
-function deleteOne (tableName, columnName, value, user_id, callback) {
+function deleteOne(tableName, columnName, value, user_id, callback) {
     var queryStr = "DELETE from {table} where {columnName}='{value}' and user_id = {user_id};".format({
         table: tableName,
         user_id: user_id,
@@ -163,7 +163,7 @@ function deleteOne (tableName, columnName, value, user_id, callback) {
     exQuery(queryStr, null, callback);
 }
 
-function selectAllOrderBy (tableName, columnName, value, orderBy, callback) {
+function selectAllOrderBy(tableName, columnName, value, orderBy, callback) {
     var queryStr = "SELECT * from {table} where {columnName}='{value}' order by {orderBy};".format({
         table: tableName,
         columnName: columnName,
@@ -173,7 +173,7 @@ function selectAllOrderBy (tableName, columnName, value, orderBy, callback) {
     select(queryStr, callback);
 }
 
-function select (queryStr, callback, rowNum) {
+function select(queryStr, callback, rowNum) {
     log.debug(queryStr);
     connection.query(queryStr, function (err, rows) {
         if (err) callback(err.code);
@@ -182,13 +182,12 @@ function select (queryStr, callback, rowNum) {
                 callback(null, rows[rowNum]);
             else
                 callback(null, rows);
-        }
-        else
+        } else
             callback(null, null);
     });
 }
 
-function exQuery (queryStr, errMessage, callback) {
+function exQuery(queryStr, errMessage, callback) {
     log.debug(queryStr);
     connection.query(queryStr, function (err, rows) { // affectedRows //insertId
         if (err) {

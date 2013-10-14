@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html ng-app="myApp">
   <head lang="en">
-    <title>Development in progress</title>
+    <title>Address book</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Brief description">
+    <meta name="description" content="Store and manage your contacts easily">
     <meta name="author" content="MG">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link href="../libs/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -15,7 +15,6 @@
     <![endif]-->
   </head>
   <body ng-controller="MainCtrl">
-
     <table class="table" style="margin-bottom:0px">
       <tr>
         <td width="400px">
@@ -29,25 +28,25 @@
           </dl>
         </td>
         <td width="20px">
-            <p class="text-left" style="margin-top:15px">
-                <a href="" ng-click="createGroup()"><span class="text-success glyphicon glyphicon-plus"></span></a>
-            </p>
+          <p class="text-left" style="margin-top:15px">
+            <a href="" ng-click="createGroup()"><span class="text-success glyphicon glyphicon-plus"></span></a>
+          </p>
         </td>
         <td width="20px">
-            <p class="text-left" style="margin-top:15px">
-                <a href="" ng-click="editGroup()"><span class="text-warning glyphicon glyphicon-pencil"></span></a>
-            </p>
+          <p class="text-left" style="margin-top:15px">
+            <a href="" ng-click="editGroup()"><span class="text-warning glyphicon glyphicon-pencil"></span></a>
+          </p>
         </td>
         <td width="20px">
-            <p class="text-left" style="margin-top:15px">
-                <a href="" ng-click="deleteGroup()"><span class="text-danger glyphicon glyphicon-remove"></span></a>
-            </p>
+          <p class="text-left" style="margin-top:15px">
+            <a href="" ng-click="deleteGroup()"><span class="text-danger glyphicon glyphicon-remove"></span></a>
+          </p>
         </td>
         <td>
-            <div class="alert alert-danger" ng-show="groupError.show">
-                {{groupError.msg}}
-                <a href="" ng-click="groupError.show=false"><span class="text-danger glyphicon glyphicon-remove-circle pull-right"></span></a>
-            </div>
+          <div class="alert alert-danger" ng-show="groupError.show">
+            {{groupError.msg}}
+            <a href="" ng-click="groupError.show=false"><span class="text-danger glyphicon glyphicon-remove-circle pull-right"></span></a>
+          </div>
         </td>
         <td>
           <form class="navbar-form navbar-right" action="/logout" method="GET">
@@ -57,7 +56,6 @@
         </td>
       </tr>
     </table>
-
     <table class="table">
       <tbody>
         <tr>
@@ -117,12 +115,13 @@
                   <dt>Group:</dt>
                   <dd>
                     <select class="form-control" style="width: 300px" ng-model="contactGroup" ng-options="g.name for g in groups">
-                        <option value="">All Contacts<option>
+                      <option value="">All Contacts
+                      <option>
                     </select>
                   </dd>
                 </dl>
                 <div class="alert alert-danger" ng-show="contactError.show">
-                    {{contactError.msg}}
+                  {{contactError.msg}}
                 </div>
                 <p class="text-right">
                   <button class="btn btn-success" ng-click="saveContact()" ng-hide="contactView">Save</button>
@@ -135,7 +134,6 @@
         </tr>
       </tbody>
     </table>
-
     <script src="../libs/jquery-2.0.3.min.js"></script>
     <script src="../libs/bootbox.min.js"></script>
     <script src="../libs/angular.min.js"></script>
