@@ -1,11 +1,11 @@
 var app = angular.module('myApp', []);
 var hostname = window.location.host;
 
-$(document).ready(function() {
+$(document).ready(function () {
     $('input').attr('maxlength', 45);
 });
 
-app.controller('MainCtrl', function($scope, $http) {
+app.controller('MainCtrl', function ($scope, $http) {
     /********** user **********/
     $scope.user = {};
 
@@ -18,7 +18,7 @@ app.controller('MainCtrl', function($scope, $http) {
     $scope.contactError = {};
     $scope.contactError.show = false;
 
-    $scope.setContact = function (c){
+    $scope.setContact = function (c) {
         if ($scope.contactView)
             $scope.contact = c;
     };
@@ -31,8 +31,8 @@ app.controller('MainCtrl', function($scope, $http) {
     }
 
     $scope.editContact = function () {
-        $scope.contactView=false;
-        $scope.newContact=clone($scope.contact);
+        $scope.contactView = false;
+        $scope.newContact = clone($scope.contact);
     }
 
     $scope.saveContact = function () {
@@ -48,7 +48,7 @@ app.controller('MainCtrl', function($scope, $http) {
 
     $scope.cancelContact = function () {
         $scope.contactError.show = false;
-        $scope.contactView=true;
+        $scope.contactView = true;
         $scope.contactCreateView = false;
         $scope.newContact = {};
         $scope.findGroupById($scope.contact.group_id);
@@ -69,7 +69,7 @@ app.controller('MainCtrl', function($scope, $http) {
     $scope.groupError.show = false;
 
     $scope.createGroup = function () {
-        bootbox.prompt('Create new group', function(result) {
+        bootbox.prompt('Create new group', function (result) {
             if (result === null) return;
             $scope.groupCreate(result);
         });
@@ -77,15 +77,15 @@ app.controller('MainCtrl', function($scope, $http) {
 
     $scope.editGroup = function () {
         if (!$scope.group || !$scope.group.name) return;
-        bootbox.prompt('Edit group', function(result) {
-          if (result === null) return;
-          $scope.groupUpdate($scope.group.id, result);
+        bootbox.prompt('Edit group', function (result) {
+            if (result === null) return;
+            $scope.groupUpdate($scope.group.id, result);
         }, $scope.group.name);
     };
 
     $scope.deleteGroup = function () {
         if (!$scope.group || !$scope.group.name) return;
-        bootbox.confirm("Do you really want to delete '" + $scope.group.name + "' group?", function(result) {
+        bootbox.confirm("Do you really want to delete '" + $scope.group.name + "' group?", function (result) {
             if (!result) return;
             $scope.groupDelete($scope.group.id);
             $scope.group = {};
@@ -93,14 +93,14 @@ app.controller('MainCtrl', function($scope, $http) {
         });
     };
 
-    $scope.setGroup = function (){
+    $scope.setGroup = function () {
         if ($scope.group)
             $scope.groupContacts($scope.group.id);
         else
             $scope.allContacts();
     };
 
-    $scope.findGroupById = function (group_id){
+    $scope.findGroupById = function (group_id) {
         if (!$scope.contactView) return;
         for (var key in $scope.groups)
             if ($scope.groups[key].id == group_id) {
@@ -118,38 +118,44 @@ app.controller('MainCtrl', function($scope, $http) {
     }
 
     /********** post/get **********/
-    $scope.getUser = function() {
+    $scope.getUser = function () {
         $http({
-                url: 'http://' + hostname + '/user/me',
-                method: "POST",
-                headers: {'Content-Type': 'application/json; charset=utf-8'}
+            url: 'http://' + hostname + '/user/me',
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
         }).success(function (data) {
             $scope.user = data.user;
         });
     };
 
-    $scope.allContacts = function() {
+    $scope.allContacts = function () {
         $http.get('http://' + hostname + '/allContacts')
-          .then(function(res) {
-            $scope.contacts = res.data;
-        });
+            .then(function (res) {
+                $scope.contacts = res.data;
+            });
     };
 
     $scope.allGroups = function () {
         $http.get('http://' + hostname + '/userGroups')
-        .then(function(res) {
-            $scope.groups = res.data;
-        });
+            .then(function (res) {
+                $scope.groups = res.data;
+            });
     };
 
     $scope.contactDelete = function (contact_id) {
-        bootbox.confirm("Do you really want to delete this contact?", function(result) {
+        bootbox.confirm("Do you really want to delete this contact?", function (result) {
             if (!result) return;
             $http({
-                    url: 'http://' + hostname + '/contactDelete',
-                    method: "POST",
-                    data: {id: contact_id},
-                    headers: {'Content-Type': 'application/json; charset=utf-8'}
+                url: 'http://' + hostname + '/contactDelete',
+                method: "POST",
+                data: {
+                    id: contact_id
+                },
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                }
             }).success(function (data) {
                 $scope.refreshContacts(data);
             });
@@ -158,21 +164,29 @@ app.controller('MainCtrl', function($scope, $http) {
 
     $scope.groupDelete = function (group_id) {
         $http({
-                url: 'http://' + hostname + '/groupDelete',
-                method: "POST",
-                data: {id: group_id},
-                headers: {'Content-Type': 'application/json; charset=utf-8'}
+            url: 'http://' + hostname + '/groupDelete',
+            method: "POST",
+            data: {
+                id: group_id
+            },
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
         }).success(function (data) {
-                $scope.allGroups();
+            $scope.allGroups();
         });
     };
 
     $scope.groupCreate = function (name) {
         $http({
-                url: 'http://' + hostname + '/groupCreate',
-                method: "POST",
-                data: {name: name},
-                headers: {'Content-Type': 'application/json; charset=utf-8'}
+            url: 'http://' + hostname + '/groupCreate',
+            method: "POST",
+            data: {
+                name: name
+            },
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
         }).success(function (data) {
             $scope.verifyGroupResponse(data);
         });
@@ -180,43 +194,56 @@ app.controller('MainCtrl', function($scope, $http) {
 
     $scope.groupUpdate = function (group_id, name) {
         $http({
-                url: 'http://' + hostname + '/groupUpdate',
-                method: "POST",
-                data: {id: group_id, name: name},
-                headers: {'Content-Type': 'application/json; charset=utf-8'}
+            url: 'http://' + hostname + '/groupUpdate',
+            method: "POST",
+            data: {
+                id: group_id,
+                name: name
+            },
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
         }).success(function (data) {
             $scope.verifyGroupResponse(data);
         });
     };
 
-    $scope.groupContacts = function(group_id) {
+    $scope.groupContacts = function (group_id) {
         $http({
-                url: 'http://' + hostname + '/groupContacts',
-                method: "POST",
-                data: {group_id: group_id},
-                headers: {'Content-Type': 'application/json; charset=utf-8'}
+            url: 'http://' + hostname + '/groupContacts',
+            method: "POST",
+            data: {
+                group_id: group_id
+            },
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
         }).success(function (data) {
-                    $scope.contacts = data;
+            $scope.contacts = data;
         });
     };
 
-    $scope.contactCreate = function(contact) {
+    $scope.contactCreate = function (contact) {
         $http({
-                url: 'http://' + hostname + '/contactCreate',
-                method: "POST",
-                data: contact,
-                headers: {'Content-Type': 'application/json; charset=utf-8'}
+            url: 'http://' + hostname + '/contactCreate',
+            method: "POST",
+            data: contact,
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
         }).success(function (data) {
             $scope.verifyContactResponse(data);
         });
     };
 
-    $scope.contactUpdate = function(contact) {
+    $scope.contactUpdate = function (contact) {
         $http({
-                url: 'http://' + hostname + '/contactUpdate',
-                method: "POST",
-                data: contact,
-                headers: {'Content-Type': 'application/json; charset=utf-8'}
+            url: 'http://' + hostname + '/contactUpdate',
+            method: "POST",
+            data: contact,
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
         }).success(function (data) {
             $scope.verifyContactResponse(data);
         });
@@ -227,8 +254,7 @@ app.controller('MainCtrl', function($scope, $http) {
         if (data.success == false) {
             $scope.groupError.msg = data.message;
             $scope.groupError.show = true;
-        }
-        else {
+        } else {
             $scope.allGroups();
             $scope.groupError.show = false;
         }
@@ -238,8 +264,7 @@ app.controller('MainCtrl', function($scope, $http) {
         if (data.success == false) {
             $scope.contactError.msg = data.message;
             $scope.contactError.show = true;
-        }
-        else {
+        } else {
             $scope.refreshContacts(data);
             $scope.contactError.show = false;
             $scope.newContact = {};
