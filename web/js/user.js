@@ -89,6 +89,7 @@ app.controller('MainCtrl', function($scope, $http) {
             if (!result) return;
             $scope.groupDelete($scope.group.id);
             $scope.group = {};
+            $scope.allContacts();
         });
     };
 
