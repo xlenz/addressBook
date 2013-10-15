@@ -265,6 +265,14 @@ app.controller('MainCtrl', function ($scope, $http) {
                 'Content-Type': 'application/json; charset=utf-8'
             }
         }).success(function (data) {
+            console.log(data);
+            if (!data) {
+                data = {};
+                data.success = false;
+                data.message = 'Unable to modify contact. Probably it was deleted.';
+                $scope.contact = {};
+                $scope.refreshContacts();
+            }
             $scope.verifyContactResponse(data);
         });
     };

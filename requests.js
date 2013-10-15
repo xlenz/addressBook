@@ -4,6 +4,7 @@ var passport;
 var logWho;
 var tools;
 var dbMysql;
+var helpers;
 exports.init = function (init) {
     app = init.app;
     log = init.log;
@@ -11,6 +12,7 @@ exports.init = function (init) {
     logWho = init.logWho;
     tools = init.tools;
     dbMysql = init.dbMysql;
+    helpers = init.helpers;
 }
 
 setTimeout(function() {

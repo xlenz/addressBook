@@ -100,5 +100,6 @@ myRequests.init({
     passport: passport,
     logWho: logWho,
     tools: tools,
-    dbMysql: dbMysql
+    dbMysql: dbMysql,
+    helpers: helpers
 });
