@@ -175,6 +175,7 @@ app.controller('MainCtrl', function ($scope, $http) {
                     'Content-Type': 'application/json; charset=utf-8'
                 }
             }).success(function (data) {
+                $scope.contact = {};
                 $scope.refreshContacts();
             });
         });
