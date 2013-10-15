@@ -64,19 +64,22 @@ app.configure(function () {
     app.use(app.router);
     app.use(function (req, res, next) {
         res.status(404);
-        log.debug('Sender: ' + req.headers.host);
-        log.debug('Not found URL: %s', req.url);
+        log.warn('Not found URL:');
+        logWho(req);
         res.send({
-            error: 'Resource ot found'
+            error: 'Resource not found',
+            code: 404
         });
         return;
     });
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
-        log.error('Sender: ' + req.headers.host);
         log.error('Internal error(%d): %s', res.statusCode, err.message);
+        logWho(req);
+        log.debug('req.body:\n', req.body);
         return res.send({
-            error: err.message
+            error: err.message,
+            code: 500
         });
     });
 });
@@ -87,7 +90,7 @@ server.listen(tools.port, tools.host, function () {
 tools.server(server);
 
 app.get("/", function (req, res) {
-    log.debug(req.headers.host + ' requests: ' + req.url);
+    logWho(req);
     if (req.isAuthenticated())
         return res.redirect('/user/me');
     log.trace('Sending ' + tools.root_html);
@@ -96,7 +99,7 @@ app.get("/", function (req, res) {
 });
 
 app.get("/user/:id", function (req, res) {
-    log.debug(req.headers.host + ' requests: ' + req.url);
+    logWho(req);
     if (!req.isAuthenticated())
         return res.redirect('/');
     if (req.params.id != 'me')
@@ -108,7 +111,7 @@ app.get("/user/:id", function (req, res) {
 
 
 app.get("/signup", function (req, res) {
-    log.debug(req.headers.host + ' requests: ' + req.url);
+    logWho(req);
     if (req.isAuthenticated())
         return res.redirect('/');
     log.trace('Sending ' + tools.signup_html);
@@ -117,7 +120,7 @@ app.get("/signup", function (req, res) {
 });
 
 app.post("/signup", function (req, res) {
-    log.debug(req.headers.host + ' requests: ' + req.url);
+    logWho(req);
     if (req.isAuthenticated())
         return res.send({
             success: false,
@@ -152,7 +155,7 @@ app.post("/signup", function (req, res) {
 });
 
 app.get("/login", function (req, res) {
-    log.debug(req.headers.host + ' requests: ' + req.url);
+    logWho(req);
     if (req.isAuthenticated())
         return res.redirect('/');
     log.trace('Sending ' + tools.signin_html);
@@ -161,7 +164,7 @@ app.get("/login", function (req, res) {
 });
 
 app.post('/login', function (req, res, next) {
-    log.debug(req.headers.host + ' requests: ' + req.url);
+    logWho(req);
     if (req.isAuthenticated())
         return res.send({
             success: false,
@@ -206,12 +209,8 @@ app.post('/login', function (req, res, next) {
 })
 
 app.post("/user/:id", function (req, res) {
-    log.debug(req.headers.host + ' requests: ' + req.url);
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
+    logWho(req);
+    if (!isAuth(req, res)) return;
 
     if (req.params.id == 'me') {
         var map = {};
@@ -228,11 +227,8 @@ app.post("/user/:id", function (req, res) {
 });
 
 app.get("/allContacts", function (req, res) {
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
+    logWho(req);
+    if (!isAuth(req, res)) return;
     dbMysql.allContacts(req.user.id, function (err, data) {
         if (err) res.send(err);
         else res.send(data);
@@ -240,11 +236,8 @@ app.get("/allContacts", function (req, res) {
 });
 
 app.post("/groupContacts", function (req, res) {
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
+    logWho(req);
+    if (!isAuth(req, res)) return;
     dbMysql.groupContacts(req.body.group_id, function (err, data) {
         if (err) res.send(err);
         else res.send(data);
@@ -252,11 +245,8 @@ app.post("/groupContacts", function (req, res) {
 });
 
 app.get("/userGroups", function (req, res) {
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
+    logWho(req);
+    if (!isAuth(req, res)) return;
     dbMysql.userGroups(req.user.id, function (err, data) {
         if (err) res.send(err);
         else res.send(data);
@@ -264,12 +254,8 @@ app.get("/userGroups", function (req, res) {
 });
 
 app.post("/contactDelete", function (req, res) {
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
-    log.info(req.body);
+    logWho(req);
+    if (!isAuth(req, res)) return;
     dbMysql.contactDelete(req.body.id, req.user.id, function (err, data) {
         if (err) res.send({
             success: false,
@@ -280,11 +266,8 @@ app.post("/contactDelete", function (req, res) {
 });
 
 app.post("/groupDelete", function (req, res) {
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
+    logWho(req);
+    if (!isAuth(req, res)) return;
     dbMysql.groupDelete(req.body.id, req.user.id, function (err, data) {
         if (err) res.send({
             success: false,
@@ -295,11 +278,8 @@ app.post("/groupDelete", function (req, res) {
 });
 
 app.post("/groupCreate", function (req, res) {
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
+    logWho(req);
+    if (!isAuth(req, res)) return;
 
     var errors = [];
     if (!helpers.validateInput(req.body.name))
@@ -323,11 +303,8 @@ app.post("/groupCreate", function (req, res) {
 });
 
 app.post("/groupUpdate", function (req, res) {
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
+    logWho(req);
+    if (!isAuth(req, res)) return;
 
     var errors = [];
 
@@ -352,11 +329,8 @@ app.post("/groupUpdate", function (req, res) {
 });
 
 app.post("/contactCreate", function (req, res) {
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
+    logWho(req);
+    if (!isAuth(req, res)) return;
 
     var errors = [];
     if (!helpers.validateInput(req.body.firstName))
@@ -394,11 +368,8 @@ app.post("/contactCreate", function (req, res) {
 });
 
 app.post("/contactUpdate", function (req, res) {
-    if (!req.isAuthenticated())
-        return res.send({
-            success: false,
-            message: 'You must be logged in.'
-        });
+    logWho(req);
+    if (!isAuth(req, res)) return;
 
     var errors = [];
     if (!helpers.validateInput(req.body.firstName))
@@ -436,10 +407,25 @@ app.post("/contactUpdate", function (req, res) {
 });
 
 app.get('/logout', function (req, res) {
-    log.debug(req.headers.host + ' requests: ' + req.url);
+    logWho(req);
     req.logout();
     res.redirect('/');
 });
+
+function logWho (req) {
+    log.debug(req.headers['x-forwarded-for'] || req.connection.remoteAddress + ' requests: ' + req.headers.host + req.url);
+}
+
+function isAuth (req, res) {
+    if (!req.isAuthenticated()) {
+        res.send({
+            success: false,
+            message: 'You must be logged in.'
+        });
+        return false;
+    }
+    return true;
+}
 
 /*
 app.post("/contactSetGroup", function (req, res) {
