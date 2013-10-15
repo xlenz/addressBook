@@ -1,1 +1,11 @@
 table tbody tr.selectedContact { background-color: #e0f0f0; }
+.noMarginBottom { margin-bottom:0px; }
+.groupSelectMaxWidth { max-width: 300px; }
+
+.groupButton { width: 20px }
+.groupButton p { margin-top:15px }
+
+.groupSelector { width: 400px }
+.groupSelector dl { margin-top:10px }
+.groupSelector dt { width:50px }
+.groupSelector dd { margin-left:0px }

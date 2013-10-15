@@ -15,41 +15,41 @@
     <![endif]-->
   </head>
   <body ng-controller="MainCtrl">
-    <table class="table" style="margin-bottom:0px">
+    <table class="table noMarginBottom">
       <tr>
-        <td width="400px">
-          <dl class="dl-horizontal" style="margin-bottom:0px; margin-top:10px">
-            <dt style="width:55px">Group: </dt>
-            <dd style="margin-left:60px">
-              <select class="form-control" style="max-width: 300px" ng-model="group" ng-options="g.name for g in groups" ng-change="setGroup()">
+        <td class= "groupSelector">
+          <dl class="dl-horizontal noMarginBottom">
+            <dt>Group: </dt>
+            <dd>
+              <select class="form-control groupSelectMaxWidth" ng-model="group" ng-options="g.name for g in groups" ng-change="setGroup()">
                 <option value="">All Contacts</option>
               </select>
             </dd>
           </dl>
         </td>
-        <td width="20px">
-          <p class="text-left" style="margin-top:15px">
+        <td class="groupButton">
+          <p class="text-left">
             <a href="" ng-click="createGroup()"><span class="text-success glyphicon glyphicon-plus"></span></a>
           </p>
         </td>
-        <td width="20px">
-          <p class="text-left" style="margin-top:15px">
+        <td class="groupButton">
+          <p class="text-left">
             <a href="" ng-click="editGroup()"><span class="text-warning glyphicon glyphicon-pencil"></span></a>
           </p>
         </td>
-        <td width="20px">
-          <p class="text-left" style="margin-top:15px">
+        <td class="groupButton">
+          <p class="text-left">
             <a href="" ng-click="deleteGroup()"><span class="text-danger glyphicon glyphicon-remove"></span></a>
           </p>
         </td>
-        <td>
-          <div class="alert alert-danger" ng-show="groupError.show">
+        <td ng-show="groupError.show">
+          <div class="alert alert-danger">
             {{groupError.msg}}
             <a href="" ng-click="groupError.show=false"><span class="text-danger glyphicon glyphicon-remove-circle pull-right"></span></a>
           </div>
         </td>
         <td>
-          <form class="navbar-form navbar-right" action="/logout" method="GET">
+          <form class="pull-right" action="/logout" method="GET">
             <nobr class="text-primary"><strong>{{user.login}}</strong></nobr>
             <button type="submit" class="btn btn-warning">Log out</button>
           </form>
@@ -114,7 +114,7 @@
                   <dd><input class="form-control" placeholder="Email" ng-model="newContact.email"></dd>
                   <dt>Group:</dt>
                   <dd>
-                    <select class="form-control" style="width: 300px" ng-model="contactGroup" ng-options="g.name for g in groups">
+                    <select class="form-control groupSelectMaxWidth" ng-model="contactGroup" ng-options="g.name for g in groups">
                       <option value="">All Contacts
                       <option>
                     </select>

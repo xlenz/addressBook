@@ -230,8 +230,7 @@ app.get("/allContacts", function (req, res) {
     logWho(req);
     if (!isAuth(req, res)) return;
     dbMysql.allContacts(req.user.id, function (err, data) {
-        if (err) res.send(err);
-        else res.send(data);
+        validateQuery (res, err, data);
     });
 });
 
@@ -239,8 +238,7 @@ app.post("/groupContacts", function (req, res) {
     logWho(req);
     if (!isAuth(req, res)) return;
     dbMysql.groupContacts(req.body.group_id, function (err, data) {
-        if (err) res.send(err);
-        else res.send(data);
+        validateQuery (res, err, data);
     });
 });
 
@@ -248,8 +246,7 @@ app.get("/userGroups", function (req, res) {
     logWho(req);
     if (!isAuth(req, res)) return;
     dbMysql.userGroups(req.user.id, function (err, data) {
-        if (err) res.send(err);
-        else res.send(data);
+        validateQuery (res, err, data);
     });
 });
 
@@ -257,11 +254,7 @@ app.post("/contactDelete", function (req, res) {
     logWho(req);
     if (!isAuth(req, res)) return;
     dbMysql.contactDelete(req.body.id, req.user.id, function (err, data) {
-        if (err) res.send({
-            success: false,
-            message: err
-        });
-        else res.send(data);
+        validateQuery (res, err, data);
     });
 });
 
@@ -269,11 +262,7 @@ app.post("/groupDelete", function (req, res) {
     logWho(req);
     if (!isAuth(req, res)) return;
     dbMysql.groupDelete(req.body.id, req.user.id, function (err, data) {
-        if (err) res.send({
-            success: false,
-            message: err
-        });
-        else res.send(data);
+        validateQuery (res, err, data);
     });
 });
 
@@ -294,11 +283,7 @@ app.post("/groupCreate", function (req, res) {
     }
 
     dbMysql.groupCreate(req.user.id, helpers.trim(req.body.name), function (err, data) {
-        if (err) res.send({
-            success: false,
-            message: err
-        });
-        else res.send(data);
+        validateQuery (res, err, data);
     });
 });
 
@@ -320,11 +305,7 @@ app.post("/groupUpdate", function (req, res) {
     }
 
     dbMysql.groupUpdate(req.body.id, helpers.trim(req.body.name), function (err, data) {
-        if (err) res.send({
-            success: false,
-            message: err
-        });
-        else res.send(data);
+        validateQuery (res, err, data);
     });
 });
 
@@ -359,11 +340,7 @@ app.post("/contactCreate", function (req, res) {
     contact.lastName = req.body.lastName;
 
     dbMysql.contactCreate(contact, function (err, data) {
-        if (err) res.send({
-            success: false,
-            message: err
-        });
-        else res.send(data);
+        validateQuery (res, err, data);
     });
 });
 
@@ -398,11 +375,7 @@ app.post("/contactUpdate", function (req, res) {
     contact.lastName = req.body.lastName;
 
     dbMysql.contactUpdate(contact, function (err, data) {
-        if (err) res.send({
-            success: false,
-            message: err
-        });
-        else res.send(data);
+        validateQuery (res, err, data);
     });
 });
 
@@ -425,6 +398,14 @@ function isAuth (req, res) {
         return false;
     }
     return true;
+}
+
+function validateQuery (res, err, data) {
+    if (err) res.send({
+        success: false,
+        message: err
+    });
+    else res.send(data);
 }
 
 /*
