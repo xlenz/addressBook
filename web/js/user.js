@@ -60,6 +60,15 @@ app.controller('MainCtrl', function ($scope, $http) {
         $scope.contactGroup = null;
     };
 
+    $scope.findContactById = function (id) {
+        for (var key in $scope.contacts) {
+            if ($scope.contacts[key].id == id) {
+                $scope.contact =  $scope.contacts[key];
+                return;
+            }
+        }
+    };
+
     /********** group **********/
     $scope.groups = [];
     $scope.group = {};
@@ -69,18 +78,26 @@ app.controller('MainCtrl', function ($scope, $http) {
     $scope.groupError.show = false;
 
     $scope.createGroup = function () {
-        bootbox.prompt('Create new group', function (result) {
-            if (result === null) return;
-            $scope.groupCreate(result);
+        bootbox.prompt({
+            title: 'Create new group',
+            callback: function (result) {
+                if (result === null) return;
+                $scope.groupCreate(result);
+            },
+            placeholder: 'Group Name'
         });
     };
 
     $scope.editGroup = function () {
         if (!$scope.group || !$scope.group.name) return;
-        bootbox.prompt('Edit group', function (result) {
-            if (result === null) return;
-            $scope.groupUpdate($scope.group.id, result);
-        }, $scope.group.name);
+        bootbox.prompt({
+            title: 'Edit group',
+            callback: function (result) {
+                if (result === null) return;
+                $scope.groupUpdate($scope.group.id, result);
+            },
+            value: $scope.group.name
+        });
     };
 
     $scope.deleteGroup = function () {
@@ -130,10 +147,11 @@ app.controller('MainCtrl', function ($scope, $http) {
         });
     };
 
-    $scope.allContacts = function () {
+    $scope.allContacts = function (contact_id) {
         $http.get('http://' + hostname + '/allContacts')
             .then(function (res) {
                 $scope.contacts = res.data;
+                if (contact_id) $scope.findContactById(contact_id);
             });
     };
 
@@ -157,7 +175,7 @@ app.controller('MainCtrl', function ($scope, $http) {
                     'Content-Type': 'application/json; charset=utf-8'
                 }
             }).success(function (data) {
-                $scope.refreshContacts(data);
+                $scope.refreshContacts();
             });
         });
     };
@@ -208,7 +226,7 @@ app.controller('MainCtrl', function ($scope, $http) {
         });
     };
 
-    $scope.groupContacts = function (group_id) {
+    $scope.groupContacts = function (group_id, contact_id) {
         $http({
             url: 'http://' + hostname + '/groupContacts',
             method: "POST",
@@ -220,6 +238,7 @@ app.controller('MainCtrl', function ($scope, $http) {
             }
         }).success(function (data) {
             $scope.contacts = data;
+            if (contact_id) $scope.findContactById(contact_id);
         });
     };
 
@@ -274,10 +293,12 @@ app.controller('MainCtrl', function ($scope, $http) {
     };
 
     $scope.refreshContacts = function (data) {
+        if (!data || !data.insertId) var id = null;
+        else id = data.insertId;
         if ($scope.group && $scope.group.id)
-            $scope.groupContacts($scope.group.id);
+            $scope.groupContacts($scope.group.id, id);
         else
-            $scope.allContacts();
+            $scope.allContacts(id);
     };
 
     /********** init **********/
