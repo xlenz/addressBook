@@ -11,10 +11,10 @@ Server Side
 * DBs: MySQL (data), mongoDB (sessions)
 
 UI
-* jQuery
-* angularJS
-* bootstrap
-* bootbox
+* jQuery 2.0.3
+* angularJS 1.0.8
+* bootstrap 3.0.0
+* bootbox 4.1.0
 
 Installation
 -----------
