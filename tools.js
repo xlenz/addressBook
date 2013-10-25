@@ -33,7 +33,7 @@ fs.watchFile(configName, function (current, previous) {
     config = JSON.parse(fs.readFileSync(configName));
     server.close();
     server.listen(config.port, config.host, function () {
-        log.info('Now listening - ' + (tools.host || '*') + ':' + (tools.port || 'default'));
+        log.info('Now listening - ' + (config.host || '*') + ':' + (config.port || 'default'));
     });
 });
 

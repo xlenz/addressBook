@@ -66,11 +66,10 @@ app.configure(function () {
         res.status(404);
         log.warn('Not found URL:');
         logWho(req);
-        res.send({
+        return res.send({
             error: 'Resource not found',
             code: 404
         });
-        return;
     });
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
