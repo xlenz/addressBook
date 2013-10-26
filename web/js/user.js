@@ -32,7 +32,7 @@ app.controller('MainCtrl', function ($scope, $http) {
 
     $scope.editContact = function () {
         $scope.contactView = false;
-        $scope.newContact = clone($scope.contact);
+        $scope.newContact = angular.copy($scope.contact);
     }
 
     $scope.saveContact = function () {
@@ -42,7 +42,7 @@ app.controller('MainCtrl', function ($scope, $http) {
             $scope.contactCreate($scope.newContact)
         else {
             $scope.contactUpdate($scope.newContact);
-            $scope.contact = clone($scope.newContact);
+            $scope.contact = angular.copy($scope.newContact);
         }
     };
 
@@ -265,7 +265,6 @@ app.controller('MainCtrl', function ($scope, $http) {
                 'Content-Type': 'application/json; charset=utf-8'
             }
         }).success(function (data) {
-            console.log(data);
             if (!data) {
                 data = {};
                 data.success = false;
@@ -315,24 +314,3 @@ app.controller('MainCtrl', function ($scope, $http) {
     $scope.allGroups();
     $scope.getUser();
 });
-
-function clone(obj) {
-    if (null == obj || "object" != typeof obj) return obj;
-    var copy = obj.constructor();
-    for (var attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-    }
-    return copy;
-}
-
-/*
-$("#contactSetGroup").click(function(event) {
-  event.preventDefault();
-  var dataObj = {};
-  dataObj.ids = [5,7];
-  dataObj.group_id = 1;
-  sendAjax('http://' + hostname + '/contactSetGroup', 'POST', dataObj, function (res) {
-    console.log(res);
-  });
-});
-*/
